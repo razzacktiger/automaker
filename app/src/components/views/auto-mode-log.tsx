@@ -37,11 +37,26 @@ export function AutoModeLog({ onClose }: AutoModeLogProps) {
       case "error":
         return <AlertCircle className="w-4 h-4 text-red-500" />;
       case "planning":
-        return <ClipboardList className="w-4 h-4 text-cyan-500" data-testid="planning-phase-icon" />;
+        return (
+          <ClipboardList
+            className="w-4 h-4 text-cyan-500"
+            data-testid="planning-phase-icon"
+          />
+        );
       case "action":
-        return <Zap className="w-4 h-4 text-orange-500" data-testid="action-phase-icon" />;
+        return (
+          <Zap
+            className="w-4 h-4 text-orange-500"
+            data-testid="action-phase-icon"
+          />
+        );
       case "verification":
-        return <ShieldCheck className="w-4 h-4 text-emerald-500" data-testid="verification-phase-icon" />;
+        return (
+          <ShieldCheck
+            className="w-4 h-4 text-emerald-500"
+            data-testid="verification-phase-icon"
+          />
+        );
     }
   };
 
@@ -80,8 +95,8 @@ export function AutoModeLog({ onClose }: AutoModeLogProps) {
   };
 
   return (
-    <Card className="h-full flex flex-col border-white/10 bg-zinc-950/50 backdrop-blur-sm">
-      <CardHeader className="p-4 border-b border-white/10 flex-shrink-0">
+    <Card className="h-full flex flex-col border-border bg-card backdrop-blur-sm">
+      <CardHeader className="p-4 border-b border-border flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Loader2 className="w-5 h-5 text-purple-500 animate-spin" />
@@ -127,12 +142,14 @@ export function AutoModeLog({ onClose }: AutoModeLogProps) {
                   <div
                     key={activity.id}
                     className={cn(
-                      "p-3 rounded-lg bg-zinc-900/50 border-l-4 hover:bg-zinc-900/70 transition-colors",
+                      "p-3 rounded-lg bg-secondary border-l-4 hover:bg-accent transition-colors",
                       getActivityColor(activity.type)
                     )}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5">{getActivityIcon(activity.type)}</div>
+                      <div className="mt-0.5">
+                        {getActivityIcon(activity.type)}
+                      </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-2 mb-1">
                           <span className="text-xs text-muted-foreground">

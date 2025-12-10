@@ -53,7 +53,9 @@ export function ContextView() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [newFileName, setNewFileName] = useState("");
   const [newFileType, setNewFileType] = useState<"text" | "image">("text");
-  const [uploadedImageData, setUploadedImageData] = useState<string | null>(null);
+  const [uploadedImageData, setUploadedImageData] = useState<string | null>(
+    null
+  );
   const [newFileContent, setNewFileContent] = useState("");
   const [isDropHovering, setIsDropHovering] = useState(false);
 
@@ -78,7 +80,15 @@ export function ContextView() {
 
   // Determine if a file is an image based on extension
   const isImageFile = (filename: string): boolean => {
-    const imageExtensions = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".bmp"];
+    const imageExtensions = [
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".gif",
+      ".webp",
+      ".svg",
+      ".bmp",
+    ];
     const ext = filename.toLowerCase().substring(filename.lastIndexOf("."));
     return imageExtensions.includes(ext);
   };
@@ -270,7 +280,9 @@ export function ContextView() {
   };
 
   // Handle drag and drop for .txt and .md files in the add context dialog textarea
-  const handleTextAreaDrop = async (e: React.DragEvent<HTMLTextAreaElement>) => {
+  const handleTextAreaDrop = async (
+    e: React.DragEvent<HTMLTextAreaElement>
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDropHovering(false);
@@ -282,8 +294,8 @@ export function ContextView() {
     const fileName = file.name.toLowerCase();
 
     // Only accept .txt and .md files
-    if (!fileName.endsWith('.txt') && !fileName.endsWith('.md')) {
-      console.warn('Only .txt and .md files are supported for drag and drop');
+    if (!fileName.endsWith(".txt") && !fileName.endsWith(".md")) {
+      console.warn("Only .txt and .md files are supported for drag and drop");
       return;
     }
 
@@ -340,7 +352,7 @@ export function ContextView() {
       data-testid="context-view"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-glass backdrop-blur-md">
         <div className="flex items-center gap-3">
           <BookOpen className="w-5 h-5 text-muted-foreground" />
           <div>
@@ -381,7 +393,10 @@ export function ContextView() {
               Context Files ({contextFiles.length})
             </h2>
           </div>
-          <div className="flex-1 overflow-y-auto p-2" data-testid="context-file-list">
+          <div
+            className="flex-1 overflow-y-auto p-2"
+            data-testid="context-file-list"
+          >
             {contextFiles.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center p-4">
                 <Upload className="w-8 h-8 text-zinc-500 mb-2" />
@@ -430,7 +445,9 @@ export function ContextView() {
                   ) : (
                     <FileText className="w-4 h-4 text-zinc-400" />
                   )}
-                  <span className="text-sm font-medium">{selectedFile.name}</span>
+                  <span className="text-sm font-medium">
+                    {selectedFile.name}
+                  </span>
                 </div>
                 <div className="flex gap-2">
                   {selectedFile.type === "text" && (
@@ -487,9 +504,7 @@ export function ContextView() {
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <File className="w-12 h-12 text-zinc-600 mx-auto mb-3" />
-                <p className="text-zinc-500">
-                  Select a file to view or edit
-                </p>
+                <p className="text-zinc-500">Select a file to view or edit</p>
                 <p className="text-zinc-600 text-sm mt-1">
                   Or drop files here to add them
                 </p>
@@ -536,7 +551,9 @@ export function ContextView() {
                 id="filename"
                 value={newFileName}
                 onChange={(e) => setNewFileName(e.target.value)}
-                placeholder={newFileType === "text" ? "context.md" : "image.png"}
+                placeholder={
+                  newFileType === "text" ? "context.md" : "image.png"
+                }
                 data-testid="new-file-name"
               />
             </div>
@@ -569,7 +586,9 @@ export function ContextView() {
                     <div className="absolute inset-0 flex items-center justify-center bg-brand-500/20 rounded-lg pointer-events-none">
                       <div className="flex flex-col items-center text-brand-400">
                         <Upload className="w-8 h-8 mb-2" />
-                        <span className="text-sm font-medium">Drop .txt or .md file here</span>
+                        <span className="text-sm font-medium">
+                          Drop .txt or .md file here
+                        </span>
                       </div>
                     </div>
                   )}
@@ -606,7 +625,9 @@ export function ContextView() {
                       <Upload className="w-8 h-8 text-zinc-500 mb-2" />
                     )}
                     <span className="text-sm text-zinc-400">
-                      {uploadedImageData ? "Click to change" : "Click to upload"}
+                      {uploadedImageData
+                        ? "Click to change"
+                        : "Click to upload"}
                     </span>
                   </label>
                 </div>
@@ -628,7 +649,10 @@ export function ContextView() {
             </Button>
             <Button
               onClick={handleAddFile}
-              disabled={!newFileName.trim() || (newFileType === "image" && !uploadedImageData)}
+              disabled={
+                !newFileName.trim() ||
+                (newFileType === "image" && !uploadedImageData)
+              }
               data-testid="confirm-add-file"
             >
               Add File
@@ -643,11 +667,15 @@ export function ContextView() {
           <DialogHeader>
             <DialogTitle>Delete Context File</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{selectedFile?.name}"? This action cannot be undone.
+              Are you sure you want to delete "{selectedFile?.name}"? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button

@@ -5,21 +5,60 @@ import { useAppStore } from "@/store/app-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Settings, Key, Eye, EyeOff, CheckCircle2, AlertCircle, Loader2, Zap, Sun, Moon, Palette, LayoutGrid, Minimize2, Square, Maximize2, Terminal } from "lucide-react";
+import {
+  Settings,
+  Key,
+  Eye,
+  EyeOff,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Zap,
+  Sun,
+  Moon,
+  Palette,
+  Terminal,
+  Ghost,
+  Snowflake,
+  Flame,
+  Sparkles,
+  Eclipse,
+  Trees,
+  Cat,
+  Atom,
+  Radio,
+  LayoutGrid,
+  Minimize2,
+  Square,
+  Maximize2,
+} from "lucide-react";
 import { getElectronAPI } from "@/lib/electron";
 
 export function SettingsView() {
-  const { apiKeys, setApiKeys, setCurrentView, theme, setTheme, kanbanCardDetailLevel, setKanbanCardDetailLevel } = useAppStore();
+  const {
+    apiKeys,
+    setApiKeys,
+    setCurrentView,
+    theme,
+    setTheme,
+    kanbanCardDetailLevel,
+    setKanbanCardDetailLevel,
+  } = useAppStore();
   const [anthropicKey, setAnthropicKey] = useState(apiKeys.anthropic);
   const [googleKey, setGoogleKey] = useState(apiKeys.google);
   const [showAnthropicKey, setShowAnthropicKey] = useState(false);
   const [showGoogleKey, setShowGoogleKey] = useState(false);
   const [saved, setSaved] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
-  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [testResult, setTestResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
   const [testingGeminiConnection, setTestingGeminiConnection] = useState(false);
-  const [geminiTestResult, setGeminiTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [geminiTestResult, setGeminiTestResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
   const [claudeCliStatus, setClaudeCliStatus] = useState<{
     success: boolean;
     status?: string;
@@ -72,12 +111,21 @@ export function SettingsView() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setTestResult({ success: true, message: data.message || "Connection successful! Claude responded." });
+        setTestResult({
+          success: true,
+          message: data.message || "Connection successful! Claude responded.",
+        });
       } else {
-        setTestResult({ success: false, message: data.error || "Failed to connect to Claude API." });
+        setTestResult({
+          success: false,
+          message: data.error || "Failed to connect to Claude API.",
+        });
       }
     } catch (error) {
-      setTestResult({ success: false, message: "Network error. Please check your connection." });
+      setTestResult({
+        success: false,
+        message: "Network error. Please check your connection.",
+      });
     } finally {
       setTestingConnection(false);
     }
@@ -99,12 +147,21 @@ export function SettingsView() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        setGeminiTestResult({ success: true, message: data.message || "Connection successful! Gemini responded." });
+        setGeminiTestResult({
+          success: true,
+          message: data.message || "Connection successful! Gemini responded.",
+        });
       } else {
-        setGeminiTestResult({ success: false, message: data.error || "Failed to connect to Gemini API." });
+        setGeminiTestResult({
+          success: false,
+          message: data.error || "Failed to connect to Gemini API.",
+        });
       }
     } catch (error) {
-      setGeminiTestResult({ success: false, message: "Network error. Please check your connection." });
+      setGeminiTestResult({
+        success: false,
+        message: "Network error. Please check your connection.",
+      });
     } finally {
       setTestingGeminiConnection(false);
     }
@@ -120,17 +177,22 @@ export function SettingsView() {
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden content-bg" data-testid="settings-view">
+    <div
+      className="flex-1 flex flex-col overflow-hidden content-bg"
+      data-testid="settings-view"
+    >
       {/* Header Section */}
-      <div className="flex-shrink-0 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md">
+      <div className="shrink-0 border-b border-border bg-glass backdrop-blur-md">
         <div className="px-8 py-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-purple-600 shadow-lg shadow-brand-500/20 flex items-center justify-center">
-              <Settings className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-brand-500 to-brand-600 shadow-lg shadow-brand-500/20 flex items-center justify-center">
+              <Settings className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Settings</h1>
-              <p className="text-sm text-zinc-400">Configure your API keys and preferences</p>
+              <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+              <p className="text-sm text-muted-foreground">
+                Configure your API keys and preferences
+              </p>
             </div>
           </div>
         </div>
@@ -140,25 +202,28 @@ export function SettingsView() {
       <div className="flex-1 overflow-y-auto p-8">
         <div className="max-w-4xl mx-auto space-y-6">
           {/* API Keys Section */}
-          <div className="rounded-xl border border-white/10 bg-zinc-900/50 backdrop-blur-md overflow-hidden">
-            <div className="p-6 border-b border-white/10">
+          <div className="rounded-xl border border-border bg-card backdrop-blur-md overflow-hidden">
+            <div className="p-6 border-b border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Key className="w-5 h-5 text-brand-500" />
-                <h2 className="text-lg font-semibold text-white">API Keys</h2>
+                <h2 className="text-lg font-semibold text-foreground">
+                  API Keys
+                </h2>
               </div>
-              <p className="text-sm text-zinc-400">
-                Configure your AI provider API keys. Keys are stored locally in your browser.
+              <p className="text-sm text-muted-foreground">
+                Configure your AI provider API keys. Keys are stored locally in
+                your browser.
               </p>
             </div>
             <div className="p-6 space-y-6">
               {/* Claude/Anthropic API Key */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="anthropic-key" className="text-zinc-300">
+                  <Label htmlFor="anthropic-key" className="text-foreground">
                     Anthropic API Key (Claude)
                   </Label>
                   {apiKeys.anthropic && (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="w-4 h-4 text-brand-500" />
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -169,14 +234,14 @@ export function SettingsView() {
                       value={anthropicKey}
                       onChange={(e) => setAnthropicKey(e.target.value)}
                       placeholder="sk-ant-..."
-                      className="pr-10 bg-zinc-950/50 border-white/10 text-white placeholder:text-zinc-500"
+                      className="pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
                       data-testid="anthropic-api-key-input"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-full px-3 text-zinc-400 hover:text-white hover:bg-transparent"
+                      className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground hover:bg-transparent"
                       onClick={() => setShowAnthropicKey(!showAnthropicKey)}
                       data-testid="toggle-anthropic-visibility"
                     >
@@ -192,7 +257,7 @@ export function SettingsView() {
                     variant="secondary"
                     onClick={handleTestConnection}
                     disabled={!anthropicKey || testingConnection}
-                    className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                    className="bg-secondary hover:bg-accent text-secondary-foreground border border-border"
                     data-testid="test-claude-connection"
                   >
                     {testingConnection ? (
@@ -218,14 +283,15 @@ export function SettingsView() {
                   >
                     console.anthropic.com
                   </a>
-                  . Alternatively, the CLAUDE_CODE_OAUTH_TOKEN environment variable can be used.
+                  . Alternatively, the CLAUDE_CODE_OAUTH_TOKEN environment
+                  variable can be used.
                 </p>
                 {testResult && (
                   <div
                     className={`flex items-center gap-2 p-3 rounded-lg ${
                       testResult.success
-                        ? 'bg-green-500/10 border border-green-500/20 text-green-400'
-                        : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                        ? "bg-green-500/10 border border-green-500/20 text-green-400"
+                        : "bg-red-500/10 border border-red-500/20 text-red-400"
                     }`}
                     data-testid="test-connection-result"
                   >
@@ -234,7 +300,12 @@ export function SettingsView() {
                     ) : (
                       <AlertCircle className="w-4 h-4" />
                     )}
-                    <span className="text-sm" data-testid="test-connection-message">{testResult.message}</span>
+                    <span
+                      className="text-sm"
+                      data-testid="test-connection-message"
+                    >
+                      {testResult.message}
+                    </span>
                   </div>
                 )}
               </div>
@@ -242,11 +313,11 @@ export function SettingsView() {
               {/* Google API Key */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="google-key" className="text-zinc-300">
+                  <Label htmlFor="google-key" className="text-foreground">
                     Google API Key (Gemini)
                   </Label>
                   {apiKeys.google && (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    <CheckCircle2 className="w-4 h-4 text-brand-500" />
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -257,14 +328,14 @@ export function SettingsView() {
                       value={googleKey}
                       onChange={(e) => setGoogleKey(e.target.value)}
                       placeholder="AIza..."
-                      className="pr-10 bg-zinc-950/50 border-white/10 text-white placeholder:text-zinc-500"
+                      className="pr-10 bg-input border-border text-foreground placeholder:text-muted-foreground"
                       data-testid="google-api-key-input"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
-                      className="absolute right-0 top-0 h-full px-3 text-zinc-400 hover:text-white hover:bg-transparent"
+                      className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground hover:bg-transparent"
                       onClick={() => setShowGoogleKey(!showGoogleKey)}
                       data-testid="toggle-google-visibility"
                     >
@@ -280,7 +351,7 @@ export function SettingsView() {
                     variant="secondary"
                     onClick={handleTestGeminiConnection}
                     disabled={!googleKey || testingGeminiConnection}
-                    className="bg-white/5 hover:bg-white/10 text-white border border-white/10"
+                    className="bg-secondary hover:bg-accent text-secondary-foreground border border-border"
                     data-testid="test-gemini-connection"
                   >
                     {testingGeminiConnection ? (
@@ -297,7 +368,8 @@ export function SettingsView() {
                   </Button>
                 </div>
                 <p className="text-xs text-zinc-500">
-                  Used for Gemini AI features (including image/design prompts). Get your key at{" "}
+                  Used for Gemini AI features (including image/design prompts).
+                  Get your key at{" "}
                   <a
                     href="https://makersuite.google.com/app/apikey"
                     target="_blank"
@@ -311,8 +383,8 @@ export function SettingsView() {
                   <div
                     className={`flex items-center gap-2 p-3 rounded-lg ${
                       geminiTestResult.success
-                        ? 'bg-green-500/10 border border-green-500/20 text-green-400'
-                        : 'bg-red-500/10 border border-red-500/20 text-red-400'
+                        ? "bg-green-500/10 border border-green-500/20 text-green-400"
+                        : "bg-red-500/10 border border-red-500/20 text-red-400"
                     }`}
                     data-testid="gemini-test-connection-result"
                   >
@@ -321,7 +393,12 @@ export function SettingsView() {
                     ) : (
                       <AlertCircle className="w-4 h-4" />
                     )}
-                    <span className="text-sm" data-testid="gemini-test-connection-message">{geminiTestResult.message}</span>
+                    <span
+                      className="text-sm"
+                      data-testid="gemini-test-connection-message"
+                    >
+                      {geminiTestResult.message}
+                    </span>
                   </div>
                 )}
               </div>
@@ -332,8 +409,8 @@ export function SettingsView() {
                 <div className="text-sm">
                   <p className="font-medium text-yellow-500">Security Notice</p>
                   <p className="text-yellow-500/80 text-xs mt-1">
-                    API keys are stored in your browser's local storage. Never share your API keys
-                    or commit them to version control.
+                    API keys are stored in your browser's local storage. Never
+                    share your API keys or commit them to version control.
                   </p>
                 </div>
               </div>
@@ -421,43 +498,165 @@ export function SettingsView() {
           )}
 
           {/* Appearance Section */}
-          <div className="rounded-xl border border-white/10 bg-zinc-900/50 backdrop-blur-md overflow-hidden">
-            <div className="p-6 border-b border-white/10">
+          <div className="rounded-xl border border-border bg-card backdrop-blur-md overflow-hidden">
+            <div className="p-6 border-b border-border">
               <div className="flex items-center gap-2 mb-2">
                 <Palette className="w-5 h-5 text-brand-500" />
-                <h2 className="text-lg font-semibold text-white">Appearance</h2>
+                <h2 className="text-lg font-semibold text-foreground">
+                  Appearance
+                </h2>
               </div>
-              <p className="text-sm text-zinc-400">
+              <p className="text-sm text-muted-foreground">
                 Customize the look and feel of your application.
               </p>
             </div>
             <div className="p-6 space-y-4">
               <div className="space-y-3">
-                <Label className="text-zinc-300">Theme</Label>
-                <div className="flex gap-3">
+                <Label className="text-foreground">Theme</Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <button
                     onClick={() => setTheme("dark")}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
                       theme === "dark"
-                        ? "bg-white/5 border-brand-500 text-white"
-                        : "bg-zinc-950/50 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
                     }`}
                     data-testid="dark-mode-button"
                   >
                     <Moon className="w-4 h-4" />
-                    <span className="font-medium text-sm">Dark Mode</span>
+                    <span className="font-medium text-sm">Dark</span>
                   </button>
                   <button
                     onClick={() => setTheme("light")}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border transition-all ${
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
                       theme === "light"
-                        ? "bg-white/5 border-brand-500 text-white"
-                        : "bg-zinc-950/50 border-white/10 text-zinc-400 hover:text-white hover:bg-white/5"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
                     }`}
                     data-testid="light-mode-button"
                   >
                     <Sun className="w-4 h-4" />
-                    <span className="font-medium text-sm">Light Mode</span>
+                    <span className="font-medium text-sm">Light</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("retro")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "retro"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="retro-mode-button"
+                  >
+                    <Terminal className="w-4 h-4" />
+                    <span className="font-medium text-sm">Retro</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("dracula")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "dracula"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="dracula-mode-button"
+                  >
+                    <Ghost className="w-4 h-4" />
+                    <span className="font-medium text-sm">Dracula</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("nord")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "nord"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="nord-mode-button"
+                  >
+                    <Snowflake className="w-4 h-4" />
+                    <span className="font-medium text-sm">Nord</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("monokai")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "monokai"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="monokai-mode-button"
+                  >
+                    <Flame className="w-4 h-4" />
+                    <span className="font-medium text-sm">Monokai</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("tokyonight")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "tokyonight"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="tokyonight-mode-button"
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    <span className="font-medium text-sm">Tokyo Night</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("solarized")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "solarized"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="solarized-mode-button"
+                  >
+                    <Eclipse className="w-4 h-4" />
+                    <span className="font-medium text-sm">Solarized</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("gruvbox")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "gruvbox"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="gruvbox-mode-button"
+                  >
+                    <Trees className="w-4 h-4" />
+                    <span className="font-medium text-sm">Gruvbox</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("catppuccin")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "catppuccin"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="catppuccin-mode-button"
+                  >
+                    <Cat className="w-4 h-4" />
+                    <span className="font-medium text-sm">Catppuccin</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("onedark")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "onedark"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="onedark-mode-button"
+                  >
+                    <Atom className="w-4 h-4" />
+                    <span className="font-medium text-sm">One Dark</span>
+                  </button>
+                  <button
+                    onClick={() => setTheme("synthwave")}
+                    className={`flex items-center justify-center gap-2 px-3 py-3 rounded-lg border transition-all ${
+                      theme === "synthwave"
+                        ? "bg-accent border-brand-500 text-foreground"
+                        : "bg-input border-border text-muted-foreground hover:text-foreground hover:bg-accent"
+                    }`}
+                    data-testid="synthwave-mode-button"
+                  >
+                    <Radio className="w-4 h-4" />
+                    <span className="font-medium text-sm">Synthwave</span>
                   </button>
                 </div>
               </div>
@@ -469,7 +668,9 @@ export function SettingsView() {
             <div className="p-6 border-b border-white/10">
               <div className="flex items-center gap-2 mb-2">
                 <LayoutGrid className="w-5 h-5 text-brand-500" />
-                <h2 className="text-lg font-semibold text-white">Kanban Card Display</h2>
+                <h2 className="text-lg font-semibold text-white">
+                  Kanban Card Display
+                </h2>
               </div>
               <p className="text-sm text-zinc-400">
                 Control how much information is displayed on Kanban cards.
@@ -490,7 +691,9 @@ export function SettingsView() {
                   >
                     <Minimize2 className="w-5 h-5" />
                     <span className="font-medium text-sm">Minimal</span>
-                    <span className="text-xs text-zinc-500 text-center">Title & category only</span>
+                    <span className="text-xs text-zinc-500 text-center">
+                      Title & category only
+                    </span>
                   </button>
                   <button
                     onClick={() => setKanbanCardDetailLevel("standard")}
@@ -503,7 +706,9 @@ export function SettingsView() {
                   >
                     <Square className="w-5 h-5" />
                     <span className="font-medium text-sm">Standard</span>
-                    <span className="text-xs text-zinc-500 text-center">Steps & progress</span>
+                    <span className="text-xs text-zinc-500 text-center">
+                      Steps & progress
+                    </span>
                   </button>
                   <button
                     onClick={() => setKanbanCardDetailLevel("detailed")}
@@ -516,13 +721,18 @@ export function SettingsView() {
                   >
                     <Maximize2 className="w-5 h-5" />
                     <span className="font-medium text-sm">Detailed</span>
-                    <span className="text-xs text-zinc-500 text-center">Model, tools & tasks</span>
+                    <span className="text-xs text-zinc-500 text-center">
+                      Model, tools & tasks
+                    </span>
                   </button>
                 </div>
                 <p className="text-xs text-zinc-500">
-                  <strong>Minimal:</strong> Shows only title and category<br />
-                  <strong>Standard:</strong> Adds steps preview and progress bar<br />
-                  <strong>Detailed:</strong> Shows all info including model, tool calls, task list, and summaries
+                  <strong>Minimal:</strong> Shows only title and category
+                  <br />
+                  <strong>Standard:</strong> Adds steps preview and progress bar
+                  <br />
+                  <strong>Detailed:</strong> Shows all info including model,
+                  tool calls, task list, and summaries
                 </p>
               </div>
             </div>
@@ -533,7 +743,7 @@ export function SettingsView() {
             <Button
               onClick={handleSave}
               data-testid="save-settings"
-              className="min-w-[120px] bg-gradient-to-r from-brand-500 to-purple-600 hover:from-brand-600 hover:to-purple-700 text-white border-0"
+              className="min-w-[120px] bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-600 text-primary-foreground border-0"
             >
               {saved ? (
                 <>

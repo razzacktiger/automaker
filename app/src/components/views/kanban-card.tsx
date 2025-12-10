@@ -97,9 +97,13 @@ export function KanbanCard({
   const { kanbanCardDetailLevel } = useAppStore();
 
   // Helper functions to check what should be shown based on detail level
-  const showSteps = kanbanCardDetailLevel === "standard" || kanbanCardDetailLevel === "detailed";
+  const showSteps =
+    kanbanCardDetailLevel === "standard" ||
+    kanbanCardDetailLevel === "detailed";
   const showAgentInfo = kanbanCardDetailLevel === "detailed";
-  const showProgressBar = kanbanCardDetailLevel === "standard" || kanbanCardDetailLevel === "detailed";
+  const showProgressBar =
+    kanbanCardDetailLevel === "standard" ||
+    kanbanCardDetailLevel === "detailed";
 
   // Load context file for in_progress, waiting_approval, and verified features
   useEffect(() => {
@@ -164,8 +168,7 @@ export function KanbanCard({
   // - skipTests items can be dragged even when in_progress or verified (unless currently running)
   // - Non-skipTests (TDD) items in progress or verified cannot be dragged
   const isDraggable =
-    feature.status === "backlog" ||
-    (feature.skipTests && !isCurrentAutoTask);
+    feature.status === "backlog" || (feature.skipTests && !isCurrentAutoTask);
   const {
     attributes,
     listeners,
@@ -188,7 +191,7 @@ export function KanbanCard({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "cursor-grab active:cursor-grabbing transition-all backdrop-blur-sm border-white/10 relative",
+        "cursor-grab active:cursor-grabbing transition-all backdrop-blur-sm border-border relative",
         isDragging && "opacity-50 scale-105 shadow-lg",
         isCurrentAutoTask &&
           "border-purple-500 border-2 shadow-purple-500/50 shadow-lg animate-pulse"
@@ -199,7 +202,7 @@ export function KanbanCard({
       {/* Shortcut key badge for in-progress cards */}
       {shortcutKey && (
         <div
-          className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-mono rounded bg-white/10 border border-white/20 text-zinc-300 z-10"
+          className="absolute top-2 left-2 px-1.5 py-0.5 text-[10px] font-mono rounded bg-muted border border-border text-muted-foreground z-10"
           data-testid={`shortcut-key-${feature.id}`}
         >
           {shortcutKey}
@@ -293,19 +296,27 @@ export function KanbanCard({
 
         {/* Agent Info Panel - shows for in_progress, waiting_approval, verified */}
         {/* Standard mode: Only show progress bar */}
-        {showProgressBar && !showAgentInfo && feature.status !== "backlog" && agentInfo && (isCurrentAutoTask || feature.status === "in_progress") && (
-          <div className="mb-3 space-y-1">
-            <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-              <div
-                className="w-full h-full bg-primary transition-transform duration-500 ease-out origin-left"
-                style={{ transform: `translateX(${agentInfo.progressPercentage - 100}%)` }}
-              />
+        {showProgressBar &&
+          !showAgentInfo &&
+          feature.status !== "backlog" &&
+          agentInfo &&
+          (isCurrentAutoTask || feature.status === "in_progress") && (
+            <div className="mb-3 space-y-1">
+              <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                <div
+                  className="w-full h-full bg-primary transition-transform duration-500 ease-out origin-left"
+                  style={{
+                    transform: `translateX(${
+                      agentInfo.progressPercentage - 100
+                    }%)`,
+                  }}
+                />
+              </div>
+              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
+                <span>{Math.round(agentInfo.progressPercentage)}%</span>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-              <span>{Math.round(agentInfo.progressPercentage)}%</span>
-            </div>
-          </div>
-        )}
+          )}
 
         {/* Detailed mode: Show all agent info */}
         {showAgentInfo && feature.status !== "backlog" && agentInfo && (
@@ -314,15 +325,22 @@ export function KanbanCard({
             <div className="flex items-center gap-2 text-xs">
               <div className="flex items-center gap-1 text-cyan-400">
                 <Cpu className="w-3 h-3" />
-                <span className="font-medium">{formatModelName(DEFAULT_MODEL)}</span>
+                <span className="font-medium">
+                  {formatModelName(DEFAULT_MODEL)}
+                </span>
               </div>
               {agentInfo.currentPhase && (
-                <div className={cn(
-                  "px-1.5 py-0.5 rounded text-[10px] font-medium",
-                  agentInfo.currentPhase === "planning" && "bg-blue-500/20 text-blue-400",
-                  agentInfo.currentPhase === "action" && "bg-amber-500/20 text-amber-400",
-                  agentInfo.currentPhase === "verification" && "bg-green-500/20 text-green-400"
-                )}>
+                <div
+                  className={cn(
+                    "px-1.5 py-0.5 rounded text-[10px] font-medium",
+                    agentInfo.currentPhase === "planning" &&
+                      "bg-blue-500/20 text-blue-400",
+                    agentInfo.currentPhase === "action" &&
+                      "bg-amber-500/20 text-amber-400",
+                    agentInfo.currentPhase === "verification" &&
+                      "bg-green-500/20 text-green-400"
+                  )}
+                >
                   {agentInfo.currentPhase}
                 </div>
               )}
@@ -334,7 +352,11 @@ export function KanbanCard({
                 <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                   <div
                     className="w-full h-full bg-primary transition-transform duration-500 ease-out origin-left"
-                    style={{ transform: `translateX(${agentInfo.progressPercentage - 100}%)` }}
+                    style={{
+                      transform: `translateX(${
+                        agentInfo.progressPercentage - 100
+                      }%)`,
+                    }}
                   />
                 </div>
                 <div className="flex items-center justify-between text-[10px] text-muted-foreground">
@@ -344,7 +366,10 @@ export function KanbanCard({
                       {agentInfo.toolCallCount} tools
                     </span>
                     {agentInfo.lastToolUsed && (
-                      <span className="text-zinc-500 truncate max-w-[80px]" title={agentInfo.lastToolUsed}>
+                      <span
+                        className="text-zinc-500 truncate max-w-[80px]"
+                        title={agentInfo.lastToolUsed}
+                      >
                         {agentInfo.lastToolUsed}
                       </span>
                     )}
@@ -360,7 +385,11 @@ export function KanbanCard({
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
                   <ListTodo className="w-3 h-3" />
                   <span>
-                    {agentInfo.todos.filter(t => t.status === "completed").length}/{agentInfo.todos.length} tasks
+                    {
+                      agentInfo.todos.filter((t) => t.status === "completed")
+                        .length
+                    }
+                    /{agentInfo.todos.length} tasks
                   </span>
                 </div>
                 <div className="space-y-0.5 max-h-16 overflow-y-auto">
@@ -376,12 +405,15 @@ export function KanbanCard({
                       ) : (
                         <Circle className="w-2.5 h-2.5 text-zinc-500 shrink-0" />
                       )}
-                      <span className={cn(
-                        "truncate",
-                        todo.status === "completed" && "text-zinc-500 line-through",
-                        todo.status === "in_progress" && "text-amber-400",
-                        todo.status === "pending" && "text-zinc-400"
-                      )}>
+                      <span
+                        className={cn(
+                          "truncate",
+                          todo.status === "completed" &&
+                            "text-zinc-500 line-through",
+                          todo.status === "in_progress" && "text-amber-400",
+                          todo.status === "pending" && "text-zinc-400"
+                        )}
+                      >
                         {todo.content}
                       </span>
                     </div>
@@ -396,7 +428,8 @@ export function KanbanCard({
             )}
 
             {/* Summary for waiting_approval and verified - prioritize feature.summary from UpdateFeatureStatus */}
-            {(feature.status === "waiting_approval" || feature.status === "verified") && (
+            {(feature.status === "waiting_approval" ||
+              feature.status === "verified") && (
               <>
                 {(feature.summary || summary || agentInfo.summary) && (
                   <div className="space-y-1 pt-1 border-t border-white/5">
@@ -423,20 +456,28 @@ export function KanbanCard({
                   </div>
                 )}
                 {/* Show tool count even without summary */}
-                {!feature.summary && !summary && !agentInfo.summary && agentInfo.toolCallCount > 0 && (
-                  <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1 border-t border-white/5">
-                    <span className="flex items-center gap-1">
-                      <Wrench className="w-2.5 h-2.5" />
-                      {agentInfo.toolCallCount} tool calls
-                    </span>
-                    {agentInfo.todos.length > 0 && (
+                {!feature.summary &&
+                  !summary &&
+                  !agentInfo.summary &&
+                  agentInfo.toolCallCount > 0 && (
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground pt-1 border-t border-white/5">
                       <span className="flex items-center gap-1">
-                        <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
-                        {agentInfo.todos.filter(t => t.status === "completed").length} tasks done
+                        <Wrench className="w-2.5 h-2.5" />
+                        {agentInfo.toolCallCount} tool calls
                       </span>
-                    )}
-                  </div>
-                )}
+                      {agentInfo.todos.length > 0 && (
+                        <span className="flex items-center gap-1">
+                          <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
+                          {
+                            agentInfo.todos.filter(
+                              (t) => t.status === "completed"
+                            ).length
+                          }{" "}
+                          tasks done
+                        </span>
+                      )}
+                    </div>
+                  )}
               </>
             )}
           </div>
@@ -672,7 +713,8 @@ export function KanbanCard({
           <DialogHeader>
             <DialogTitle>Delete Feature</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this feature? This action cannot be undone.
+              Are you sure you want to delete this feature? This action cannot
+              be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -713,7 +755,10 @@ export function KanbanCard({
           </DialogHeader>
           <div className="flex-1 overflow-y-auto p-4 bg-zinc-900/50 rounded-lg border border-white/10">
             <Markdown>
-              {feature.summary || summary || agentInfo?.summary || "No summary available"}
+              {feature.summary ||
+                summary ||
+                agentInfo?.summary ||
+                "No summary available"}
             </Markdown>
           </div>
           <DialogFooter>

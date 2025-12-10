@@ -41,17 +41,52 @@ export default function Home() {
   // Apply theme class to document
   useEffect(() => {
     const root = document.documentElement;
+    root.classList.remove(
+      "dark",
+      "retro",
+      "light",
+      "dracula",
+      "nord",
+      "monokai",
+      "tokyonight",
+      "solarized",
+      "gruvbox",
+      "catppuccin",
+      "onedark",
+      "synthwave"
+    );
+
     if (theme === "dark") {
       root.classList.add("dark");
+    } else if (theme === "retro") {
+      root.classList.add("retro");
+    } else if (theme === "dracula") {
+      root.classList.add("dracula");
+    } else if (theme === "nord") {
+      root.classList.add("nord");
+    } else if (theme === "monokai") {
+      root.classList.add("monokai");
+    } else if (theme === "tokyonight") {
+      root.classList.add("tokyonight");
+    } else if (theme === "solarized") {
+      root.classList.add("solarized");
+    } else if (theme === "gruvbox") {
+      root.classList.add("gruvbox");
+    } else if (theme === "catppuccin") {
+      root.classList.add("catppuccin");
+    } else if (theme === "onedark") {
+      root.classList.add("onedark");
+    } else if (theme === "synthwave") {
+      root.classList.add("synthwave");
     } else if (theme === "light") {
-      root.classList.remove("dark");
-    } else {
+      root.classList.add("light");
+    } else if (theme === "system") {
       // System theme
       const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
       if (isDark) {
         root.classList.add("dark");
       } else {
-        root.classList.remove("dark");
+        root.classList.add("light");
       }
     }
   }, [theme]);

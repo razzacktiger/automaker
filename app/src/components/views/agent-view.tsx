@@ -452,7 +452,7 @@ export function AgentView() {
       {/* Chat Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md">
+        <div className="flex items-center justify-between p-4 border-b border-border bg-glass backdrop-blur-md">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
@@ -503,7 +503,10 @@ export function AgentView() {
 
         {/* Messages */}
         {!currentSessionId ? (
-          <div className="flex-1 flex items-center justify-center" data-testid="no-session-placeholder">
+          <div
+            className="flex-1 flex items-center justify-center"
+            data-testid="no-session-placeholder"
+          >
             <div className="text-center">
               <Bot className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
               <h2 className="text-lg font-semibold mb-2">

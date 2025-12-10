@@ -213,7 +213,7 @@ export function AgentToolsView() {
       data-testid="agent-tools-view"
     >
       {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md">
+      <div className="flex items-center gap-3 p-4 border-b border-border bg-glass backdrop-blur-md">
         <Wrench className="w-5 h-5 text-primary" />
         <div>
           <h1 className="text-xl font-bold">Agent Tools</h1>

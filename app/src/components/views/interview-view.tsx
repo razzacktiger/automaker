@@ -357,7 +357,7 @@ export function InterviewView() {
       data-testid="interview-view"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-glass backdrop-blur-md">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -545,7 +545,7 @@ export function InterviewView() {
                   <Button
                     onClick={handleCreateProject}
                     disabled={!projectName || !projectPath || isGenerating}
-                    className="w-full bg-gradient-to-r from-brand-500 to-purple-600 hover:from-brand-600 hover:to-purple-700 text-white border-0"
+                    className="w-full bg-linear-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-600 text-primary-foreground border-0"
                     data-testid="interview-create-project"
                   >
                     {isGenerating ? (

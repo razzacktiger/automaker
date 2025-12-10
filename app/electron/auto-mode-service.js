@@ -32,7 +32,7 @@ class AutoModeService {
       query: null,
       projectPath: null,
       sendToRenderer: null,
-      isActive: () => this.runningFeatures.has(featureId)
+      isActive: () => this.runningFeatures.has(featureId),
     };
     return context;
   }
@@ -126,7 +126,11 @@ class AutoModeService {
       console.log(`[AutoMode] Running feature: ${feature.description}`);
 
       // Update feature status to in_progress
-      await featureLoader.updateFeatureStatus(featureId, "in_progress", projectPath);
+      await featureLoader.updateFeatureStatus(
+        featureId,
+        "in_progress",
+        projectPath
+      );
 
       sendToRenderer({
         type: "auto_mode_feature_start",
@@ -135,7 +139,12 @@ class AutoModeService {
       });
 
       // Implement the feature
-      const result = await featureExecutor.implementFeature(feature, projectPath, sendToRenderer, execution);
+      const result = await featureExecutor.implementFeature(
+        feature,
+        projectPath,
+        sendToRenderer,
+        execution
+      );
 
       // Update feature status based on result
       // For skipTests features, go to waiting_approval on success instead of verified
@@ -145,7 +154,11 @@ class AutoModeService {
       } else {
         newStatus = "backlog";
       }
-      await featureLoader.updateFeatureStatus(feature.id, newStatus, projectPath);
+      await featureLoader.updateFeatureStatus(
+        feature.id,
+        newStatus,
+        projectPath
+      );
 
       // Delete context file only if verified (not for waiting_approval)
       if (newStatus === "verified") {
@@ -214,11 +227,20 @@ class AutoModeService {
       });
 
       // Verify the feature by running tests
-      const result = await featureVerifier.verifyFeatureTests(feature, projectPath, sendToRenderer, execution);
+      const result = await featureVerifier.verifyFeatureTests(
+        feature,
+        projectPath,
+        sendToRenderer,
+        execution
+      );
 
       // Update feature status based on result
       const newStatus = result.passes ? "verified" : "in_progress";
-      await featureLoader.updateFeatureStatus(featureId, newStatus, projectPath);
+      await featureLoader.updateFeatureStatus(
+        featureId,
+        newStatus,
+        projectPath
+      );
 
       // Delete context file if verified
       if (newStatus === "verified") {
@@ -287,10 +309,19 @@ class AutoModeService {
       });
 
       // Read existing context
-      const previousContext = await contextManager.readContextFile(projectPath, featureId);
+      const previousContext = await contextManager.readContextFile(
+        projectPath,
+        featureId
+      );
 
       // Resume implementation with context
-      const result = await featureExecutor.resumeFeatureWithContext(feature, projectPath, sendToRenderer, previousContext, execution);
+      const result = await featureExecutor.resumeFeatureWithContext(
+        feature,
+        projectPath,
+        sendToRenderer,
+        previousContext,
+        execution
+      );
 
       // If the agent ends early without finishing, automatically re-run
       let attempts = 0;
@@ -304,11 +335,16 @@ class AutoModeService {
 
         if (updatedFeature && updatedFeature.status === "in_progress") {
           attempts++;
-          console.log(`[AutoMode] Feature ended early, auto-retrying (attempt ${attempts}/${maxAttempts})...`);
+          console.log(
+            `[AutoMode] Feature ended early, auto-retrying (attempt ${attempts}/${maxAttempts})...`
+          );
 
           // Update context file with retry message
-          await contextManager.writeToContextFile(projectPath, featureId,
-            `\n\n🔄 Auto-retry #${attempts} - Continuing implementation...\n\n`);
+          await contextManager.writeToContextFile(
+            projectPath,
+            featureId,
+            `\n\n🔄 Auto-retry #${attempts} - Continuing implementation...\n\n`
+          );
 
           sendToRenderer({
             type: "auto_mode_progress",
@@ -317,10 +353,19 @@ class AutoModeService {
           });
 
           // Read updated context
-          const retryContext = await contextManager.readContextFile(projectPath, featureId);
+          const retryContext = await contextManager.readContextFile(
+            projectPath,
+            featureId
+          );
 
           // Resume again with full context
-          finalResult = await featureExecutor.resumeFeatureWithContext(feature, projectPath, sendToRenderer, retryContext, execution);
+          finalResult = await featureExecutor.resumeFeatureWithContext(
+            feature,
+            projectPath,
+            sendToRenderer,
+            retryContext,
+            execution
+          );
         } else {
           break;
         }
@@ -334,7 +379,11 @@ class AutoModeService {
       } else {
         newStatus = "in_progress";
       }
-      await featureLoader.updateFeatureStatus(featureId, newStatus, projectPath);
+      await featureLoader.updateFeatureStatus(
+        featureId,
+        newStatus,
+        projectPath
+      );
 
       // Delete context file only if verified (not for waiting_approval)
       if (newStatus === "verified") {
@@ -389,7 +438,9 @@ class AutoModeService {
 
         // Skip if this feature is already running (via manual trigger)
         if (this.runningFeatures.has(currentFeatureId)) {
-          console.log(`[AutoMode] Skipping ${currentFeatureId} - already running`);
+          console.log(
+            `[AutoMode] Skipping ${currentFeatureId} - already running`
+          );
           await this.sleep(3000);
           continue;
         }
@@ -409,7 +460,12 @@ class AutoModeService {
         this.runningFeatures.set(currentFeatureId, execution);
 
         // Implement the feature
-        const result = await featureExecutor.implementFeature(nextFeature, projectPath, sendToRenderer, execution);
+        const result = await featureExecutor.implementFeature(
+          nextFeature,
+          projectPath,
+          sendToRenderer,
+          execution
+        );
 
         // Update feature status based on result
         // For skipTests features, go to waiting_approval on success instead of verified
@@ -419,7 +475,11 @@ class AutoModeService {
         } else {
           newStatus = "backlog";
         }
-        await featureLoader.updateFeatureStatus(nextFeature.id, newStatus, projectPath);
+        await featureLoader.updateFeatureStatus(
+          nextFeature.id,
+          newStatus,
+          projectPath
+        );
 
         // Delete context file only if verified (not for waiting_approval)
         if (newStatus === "verified") {
@@ -495,7 +555,12 @@ class AutoModeService {
       });
 
       // Perform the analysis
-      const result = await projectAnalyzer.runProjectAnalysis(projectPath, analysisId, sendToRenderer, execution);
+      const result = await projectAnalyzer.runProjectAnalysis(
+        projectPath,
+        analysisId,
+        sendToRenderer,
+        execution
+      );
 
       sendToRenderer({
         type: "auto_mode_feature_complete",
@@ -543,13 +608,21 @@ class AutoModeService {
    * Follow-up on a feature with additional prompt
    * This continues work on a feature that's in waiting_approval status
    */
-  async followUpFeature({ projectPath, featureId, prompt, imagePaths, sendToRenderer }) {
+  async followUpFeature({
+    projectPath,
+    featureId,
+    prompt,
+    imagePaths,
+    sendToRenderer,
+  }) {
     // Check if this feature is already running
     if (this.runningFeatures.has(featureId)) {
       throw new Error(`Feature ${featureId} is already running`);
     }
 
-    console.log(`[AutoMode] Follow-up on feature: ${featureId} with prompt: ${prompt}`);
+    console.log(
+      `[AutoMode] Follow-up on feature: ${featureId} with prompt: ${prompt}`
+    );
 
     // Register this feature as running
     const execution = this.createExecutionContext(featureId);
@@ -559,7 +632,14 @@ class AutoModeService {
 
     // Start the async work in the background (don't await)
     // This allows the API to return immediately so the modal can close
-    this.runFollowUpWork({ projectPath, featureId, prompt, imagePaths, sendToRenderer, execution }).catch((error) => {
+    this.runFollowUpWork({
+      projectPath,
+      featureId,
+      prompt,
+      imagePaths,
+      sendToRenderer,
+      execution,
+    }).catch((error) => {
       console.error("[AutoMode] Follow-up work error:", error);
       this.runningFeatures.delete(featureId);
     });
@@ -571,7 +651,14 @@ class AutoModeService {
   /**
    * Internal method to run follow-up work asynchronously
    */
-  async runFollowUpWork({ projectPath, featureId, prompt, imagePaths, sendToRenderer, execution }) {
+  async runFollowUpWork({
+    projectPath,
+    featureId,
+    prompt,
+    imagePaths,
+    sendToRenderer,
+    execution,
+  }) {
     try {
       // Load features
       const features = await featureLoader.loadFeatures(projectPath);
@@ -584,7 +671,11 @@ class AutoModeService {
       console.log(`[AutoMode] Following up on feature: ${feature.description}`);
 
       // Update status to in_progress
-      await featureLoader.updateFeatureStatus(featureId, "in_progress", projectPath);
+      await featureLoader.updateFeatureStatus(
+        featureId,
+        "in_progress",
+        projectPath
+      );
 
       sendToRenderer({
         type: "auto_mode_feature_start",
@@ -593,11 +684,18 @@ class AutoModeService {
       });
 
       // Read existing context and append follow-up prompt
-      const previousContext = await contextManager.readContextFile(projectPath, featureId);
+      const previousContext = await contextManager.readContextFile(
+        projectPath,
+        featureId
+      );
 
       // Append follow-up prompt to context
       const followUpContext = `${previousContext}\n\n## Follow-up Instructions\n\n${prompt}`;
-      await contextManager.writeToContextFile(projectPath, featureId, `\n\n## Follow-up Instructions\n\n${prompt}`);
+      await contextManager.writeToContextFile(
+        projectPath,
+        featureId,
+        `\n\n## Follow-up Instructions\n\n${prompt}`
+      );
 
       // Resume implementation with follow-up context and optional images
       const result = await featureExecutor.resumeFeatureWithContext(
@@ -610,10 +708,16 @@ class AutoModeService {
 
       // For skipTests features, go to waiting_approval on success instead of verified
       const newStatus = result.passes
-        ? (feature.skipTests ? "waiting_approval" : "verified")
+        ? feature.skipTests
+          ? "waiting_approval"
+          : "verified"
         : "in_progress";
 
-      await featureLoader.updateFeatureStatus(feature.id, newStatus, projectPath);
+      await featureLoader.updateFeatureStatus(
+        feature.id,
+        newStatus,
+        projectPath
+      );
 
       // Delete context file if verified (only for non-skipTests)
       if (newStatus === "verified") {
@@ -674,10 +778,19 @@ class AutoModeService {
       });
 
       // Run git commit via the agent
-      const commitResult = await featureExecutor.commitChangesOnly(feature, projectPath, sendToRenderer, execution);
+      const commitResult = await featureExecutor.commitChangesOnly(
+        feature,
+        projectPath,
+        sendToRenderer,
+        execution
+      );
 
       // Update status to verified
-      await featureLoader.updateFeatureStatus(featureId, "verified", projectPath);
+      await featureLoader.updateFeatureStatus(
+        featureId,
+        "verified",
+        projectPath
+      );
 
       // Delete context file
       await contextManager.deleteContextFile(projectPath, featureId);

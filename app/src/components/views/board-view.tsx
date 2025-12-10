@@ -16,7 +16,14 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useAppStore, Feature, FeatureImage, FeatureImagePath, AgentModel, ThinkingLevel } from "@/store/app-store";
+import {
+  useAppStore,
+  Feature,
+  FeatureImage,
+  FeatureImagePath,
+  AgentModel,
+  ThinkingLevel,
+} from "@/store/app-store";
 import { getElectronAPI } from "@/lib/electron";
 import { cn } from "@/lib/utils";
 import {
@@ -31,7 +38,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CategoryAutocomplete } from "@/components/ui/category-autocomplete";
 import { FeatureImageUpload } from "@/components/ui/feature-image-upload";
-import { DescriptionImageDropZone, FeatureImagePath as DescriptionImagePath } from "@/components/ui/description-image-dropzone";
+import {
+  DescriptionImageDropZone,
+  FeatureImagePath as DescriptionImagePath,
+} from "@/components/ui/description-image-dropzone";
 import {
   Dialog,
   DialogContent,
@@ -44,7 +54,24 @@ import { KanbanColumn } from "./kanban-column";
 import { KanbanCard } from "./kanban-card";
 import { AutoModeLog } from "./auto-mode-log";
 import { AgentOutputModal } from "./agent-output-modal";
-import { Plus, RefreshCw, Play, StopCircle, Loader2, ChevronUp, ChevronDown, Users, Trash2, FastForward, FlaskConical, CheckCircle2, MessageSquare, GitCommit, Brain, Zap } from "lucide-react";
+import {
+  Plus,
+  RefreshCw,
+  Play,
+  StopCircle,
+  Loader2,
+  ChevronUp,
+  ChevronDown,
+  Users,
+  Trash2,
+  FastForward,
+  FlaskConical,
+  CheckCircle2,
+  MessageSquare,
+  GitCommit,
+  Brain,
+  Zap,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -96,13 +123,18 @@ export function BoardView() {
   const [showActivityLog, setShowActivityLog] = useState(false);
   const [showOutputModal, setShowOutputModal] = useState(false);
   const [outputFeature, setOutputFeature] = useState<Feature | null>(null);
-  const [featuresWithContext, setFeaturesWithContext] = useState<Set<string>>(new Set());
-  const [showDeleteAllVerifiedDialog, setShowDeleteAllVerifiedDialog] = useState(false);
+  const [featuresWithContext, setFeaturesWithContext] = useState<Set<string>>(
+    new Set()
+  );
+  const [showDeleteAllVerifiedDialog, setShowDeleteAllVerifiedDialog] =
+    useState(false);
   const [persistedCategories, setPersistedCategories] = useState<string[]>([]);
   const [showFollowUpDialog, setShowFollowUpDialog] = useState(false);
   const [followUpFeature, setFollowUpFeature] = useState<Feature | null>(null);
   const [followUpPrompt, setFollowUpPrompt] = useState("");
-  const [followUpImagePaths, setFollowUpImagePaths] = useState<DescriptionImagePath[]>([]);
+  const [followUpImagePaths, setFollowUpImagePaths] = useState<
+    DescriptionImagePath[]
+  >([]);
 
   // Make current project available globally for modal
   useEffect(() => {
@@ -136,39 +168,36 @@ export function BoardView() {
   const startNextFeaturesRef = useRef<() => void>(() => {});
 
   // Keyboard shortcuts for this view
-  const boardShortcuts: KeyboardShortcut[] = useMemo(
-    () => {
-      const shortcuts: KeyboardShortcut[] = [
-        {
-          key: ACTION_SHORTCUTS.addFeature,
-          action: () => setShowAddDialog(true),
-          description: "Add new feature",
-        },
-        {
-          key: ACTION_SHORTCUTS.startNext,
-          action: () => startNextFeaturesRef.current(),
-          description: "Start next features from backlog",
-        },
-      ];
+  const boardShortcuts: KeyboardShortcut[] = useMemo(() => {
+    const shortcuts: KeyboardShortcut[] = [
+      {
+        key: ACTION_SHORTCUTS.addFeature,
+        action: () => setShowAddDialog(true),
+        description: "Add new feature",
+      },
+      {
+        key: ACTION_SHORTCUTS.startNext,
+        action: () => startNextFeaturesRef.current(),
+        description: "Start next features from backlog",
+      },
+    ];
 
-      // Add shortcuts for in-progress cards (1-9 and 0 for 10th)
-      inProgressFeaturesForShortcuts.slice(0, 10).forEach((feature, index) => {
-        // Keys 1-9 for first 9 cards, 0 for 10th card
-        const key = index === 9 ? "0" : String(index + 1);
-        shortcuts.push({
-          key,
-          action: () => {
-            setOutputFeature(feature);
-            setShowOutputModal(true);
-          },
-          description: `View output for in-progress card ${index + 1}`,
-        });
+    // Add shortcuts for in-progress cards (1-9 and 0 for 10th)
+    inProgressFeaturesForShortcuts.slice(0, 10).forEach((feature, index) => {
+      // Keys 1-9 for first 9 cards, 0 for 10th card
+      const key = index === 9 ? "0" : String(index + 1);
+      shortcuts.push({
+        key,
+        action: () => {
+          setOutputFeature(feature);
+          setShowOutputModal(true);
+        },
+        description: `View output for in-progress card ${index + 1}`,
       });
+    });
 
-      return shortcuts;
-    },
-    [inProgressFeaturesForShortcuts]
-  );
+    return shortcuts;
+  }, [inProgressFeaturesForShortcuts]);
   useKeyboardShortcuts(boardShortcuts);
 
   // Prevent hydration issues
@@ -218,7 +247,9 @@ export function BoardView() {
 
     // If project switched, clear features first to prevent cross-contamination
     if (previousPath !== null && currentPath !== previousPath) {
-      console.log(`[BoardView] Project switch detected: ${previousPath} -> ${currentPath}, clearing features`);
+      console.log(
+        `[BoardView] Project switch detected: ${previousPath} -> ${currentPath}, clearing features`
+      );
       isSwitchingProjectRef.current = true;
       setFeatures([]);
       setPersistedCategories([]); // Also clear categories
@@ -236,14 +267,12 @@ export function BoardView() {
 
       if (result.success && result.content) {
         const parsed = JSON.parse(result.content);
-        const featuresWithIds = parsed.map(
-          (f: any, index: number) => ({
-            ...f,
-            id: f.id || `feature-${index}-${Date.now()}`,
-            status: f.status || "backlog",
-            startedAt: f.startedAt, // Preserve startedAt timestamp
-          })
-        );
+        const featuresWithIds = parsed.map((f: any, index: number) => ({
+          ...f,
+          id: f.id || `feature-${index}-${Date.now()}`,
+          status: f.status || "backlog",
+          startedAt: f.startedAt, // Preserve startedAt timestamp
+        }));
         setFeatures(featuresWithIds);
       }
     } catch (error) {
@@ -281,33 +310,36 @@ export function BoardView() {
   }, [currentProject]);
 
   // Save a new category to the persisted categories file
-  const saveCategory = useCallback(async (category: string) => {
-    if (!currentProject || !category.trim()) return;
+  const saveCategory = useCallback(
+    async (category: string) => {
+      if (!currentProject || !category.trim()) return;
 
-    try {
-      const api = getElectronAPI();
+      try {
+        const api = getElectronAPI();
 
-      // Read existing categories
-      let categories: string[] = [...persistedCategories];
+        // Read existing categories
+        let categories: string[] = [...persistedCategories];
 
-      // Add new category if it doesn't exist
-      if (!categories.includes(category)) {
-        categories.push(category);
-        categories.sort(); // Keep sorted
+        // Add new category if it doesn't exist
+        if (!categories.includes(category)) {
+          categories.push(category);
+          categories.sort(); // Keep sorted
 
-        // Write back to file
-        await api.writeFile(
-          `${currentProject.path}/.automaker/categories.json`,
-          JSON.stringify(categories, null, 2)
-        );
+          // Write back to file
+          await api.writeFile(
+            `${currentProject.path}/.automaker/categories.json`,
+            JSON.stringify(categories, null, 2)
+          );
 
-        // Update state
-        setPersistedCategories(categories);
+          // Update state
+          setPersistedCategories(categories);
+        }
+      } catch (error) {
+        console.error("Failed to save category:", error);
       }
-    } catch (error) {
-      console.error("Failed to save category:", error);
-    }
-  }, [currentProject, persistedCategories]);
+    },
+    [currentProject, persistedCategories]
+  );
 
   // Auto-show activity log when auto mode starts
   useEffect(() => {
@@ -350,7 +382,10 @@ export function BoardView() {
 
         const status = await api.autoMode.status();
         if (status.success && status.runningFeatures) {
-          console.log("[Board] Syncing running tasks from backend:", status.runningFeatures);
+          console.log(
+            "[Board] Syncing running tasks from backend:",
+            status.runningFeatures
+          );
 
           // Clear existing running tasks and add the actual running ones
           const { clearRunningTasks, addRunningTask } = useAppStore.getState();
@@ -372,7 +407,9 @@ export function BoardView() {
   // Check which features have context files
   useEffect(() => {
     const checkAllContexts = async () => {
-      const inProgressFeatures = features.filter((f) => f.status === "in_progress");
+      const inProgressFeatures = features.filter(
+        (f) => f.status === "in_progress"
+      );
       const contextChecks = await Promise.all(
         inProgressFeatures.map(async (f) => ({
           id: f.id,
@@ -461,7 +498,9 @@ export function BoardView() {
     if (draggedFeature.status !== "backlog") {
       // Only allow dragging in_progress/verified if it's a skipTests feature and not currently running
       if (!draggedFeature.skipTests || isRunningTask) {
-        console.log("[Board] Cannot drag feature - TDD feature or currently running");
+        console.log(
+          "[Board] Cannot drag feature - TDD feature or currently running"
+        );
         return;
       }
     }
@@ -486,10 +525,16 @@ export function BoardView() {
     if (targetStatus === draggedFeature.status) return;
 
     // Check concurrency limit before moving to in_progress (only for backlog -> in_progress and if running agent)
-    if (targetStatus === "in_progress" && draggedFeature.status === "backlog" && !autoMode.canStartNewTask) {
+    if (
+      targetStatus === "in_progress" &&
+      draggedFeature.status === "backlog" &&
+      !autoMode.canStartNewTask
+    ) {
       console.log("[Board] Cannot start new task - at max concurrency limit");
       toast.error("Concurrency limit reached", {
-        description: `You can only have ${autoMode.maxConcurrency} task${autoMode.maxConcurrency > 1 ? "s" : ""} running at a time. Wait for a task to complete or increase the limit.`,
+        description: `You can only have ${autoMode.maxConcurrency} task${
+          autoMode.maxConcurrency > 1 ? "s" : ""
+        } running at a time. Wait for a task to complete or increase the limit.`,
       });
       return;
     }
@@ -499,7 +544,10 @@ export function BoardView() {
       // From backlog
       if (targetStatus === "in_progress") {
         // Update with startedAt timestamp
-        updateFeature(featureId, { status: targetStatus, startedAt: new Date().toISOString() });
+        updateFeature(featureId, {
+          status: targetStatus,
+          startedAt: new Date().toISOString(),
+        });
         console.log("[Board] Feature moved to in_progress, starting agent...");
         await handleRunFeature(draggedFeature);
       } else {
@@ -507,23 +555,41 @@ export function BoardView() {
       }
     } else if (draggedFeature.skipTests) {
       // skipTests feature being moved between in_progress and verified
-      if (targetStatus === "verified" && draggedFeature.status === "in_progress") {
+      if (
+        targetStatus === "verified" &&
+        draggedFeature.status === "in_progress"
+      ) {
         // Manual verify via drag
         moveFeature(featureId, "verified");
         toast.success("Feature verified", {
-          description: `Marked as verified: ${draggedFeature.description.slice(0, 50)}${draggedFeature.description.length > 50 ? "..." : ""}`,
+          description: `Marked as verified: ${draggedFeature.description.slice(
+            0,
+            50
+          )}${draggedFeature.description.length > 50 ? "..." : ""}`,
         });
-      } else if (targetStatus === "in_progress" && draggedFeature.status === "verified") {
+      } else if (
+        targetStatus === "in_progress" &&
+        draggedFeature.status === "verified"
+      ) {
         // Move back to in_progress
-        updateFeature(featureId, { status: "in_progress", startedAt: new Date().toISOString() });
+        updateFeature(featureId, {
+          status: "in_progress",
+          startedAt: new Date().toISOString(),
+        });
         toast.info("Feature moved back", {
-          description: `Moved back to In Progress: ${draggedFeature.description.slice(0, 50)}${draggedFeature.description.length > 50 ? "..." : ""}`,
+          description: `Moved back to In Progress: ${draggedFeature.description.slice(
+            0,
+            50
+          )}${draggedFeature.description.length > 50 ? "..." : ""}`,
         });
       } else if (targetStatus === "backlog") {
         // Allow moving skipTests cards back to backlog
         moveFeature(featureId, "backlog");
         toast.info("Feature moved to backlog", {
-          description: `Moved to Backlog: ${draggedFeature.description.slice(0, 50)}${draggedFeature.description.length > 50 ? "..." : ""}`,
+          description: `Moved to Backlog: ${draggedFeature.description.slice(
+            0,
+            50
+          )}${draggedFeature.description.length > 50 ? "..." : ""}`,
         });
       }
     }
@@ -544,7 +610,16 @@ export function BoardView() {
     });
     // Persist the category
     saveCategory(category);
-    setNewFeature({ category: "", description: "", steps: [""], images: [], imagePaths: [], skipTests: false, model: "opus", thinkingLevel: "none" });
+    setNewFeature({
+      category: "",
+      description: "",
+      steps: [""],
+      images: [],
+      imagePaths: [],
+      skipTests: false,
+      model: "opus",
+      thinkingLevel: "none",
+    });
     setShowAddDialog(false);
   };
 
@@ -578,7 +653,10 @@ export function BoardView() {
       try {
         await autoMode.stopFeature(featureId);
         toast.success("Agent stopped", {
-          description: `Stopped and deleted: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`,
+          description: `Stopped and deleted: ${feature.description.slice(
+            0,
+            50
+          )}${feature.description.length > 50 ? "..." : ""}`,
         });
       } catch (error) {
         console.error("[Board] Error stopping feature before delete:", error);
@@ -627,7 +705,10 @@ export function BoardView() {
   const handleVerifyFeature = async (feature: Feature) => {
     if (!currentProject) return;
 
-    console.log("[Board] Verifying feature:", { id: feature.id, description: feature.description });
+    console.log("[Board] Verifying feature:", {
+      id: feature.id,
+      description: feature.description,
+    });
 
     try {
       const api = getElectronAPI();
@@ -659,7 +740,10 @@ export function BoardView() {
   const handleResumeFeature = async (feature: Feature) => {
     if (!currentProject) return;
 
-    console.log("[Board] Resuming feature:", { id: feature.id, description: feature.description });
+    console.log("[Board] Resuming feature:", {
+      id: feature.id,
+      description: feature.description,
+    });
 
     try {
       const api = getElectronAPI();
@@ -690,25 +774,42 @@ export function BoardView() {
 
   // Manual verification handler for skipTests features
   const handleManualVerify = (feature: Feature) => {
-    console.log("[Board] Manually verifying feature:", { id: feature.id, description: feature.description });
+    console.log("[Board] Manually verifying feature:", {
+      id: feature.id,
+      description: feature.description,
+    });
     moveFeature(feature.id, "verified");
     toast.success("Feature verified", {
-      description: `Marked as verified: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`,
+      description: `Marked as verified: ${feature.description.slice(0, 50)}${
+        feature.description.length > 50 ? "..." : ""
+      }`,
     });
   };
 
   // Move feature back to in_progress from verified (for skipTests features)
   const handleMoveBackToInProgress = (feature: Feature) => {
-    console.log("[Board] Moving feature back to in_progress:", { id: feature.id, description: feature.description });
-    updateFeature(feature.id, { status: "in_progress", startedAt: new Date().toISOString() });
+    console.log("[Board] Moving feature back to in_progress:", {
+      id: feature.id,
+      description: feature.description,
+    });
+    updateFeature(feature.id, {
+      status: "in_progress",
+      startedAt: new Date().toISOString(),
+    });
     toast.info("Feature moved back", {
-      description: `Moved back to In Progress: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`,
+      description: `Moved back to In Progress: ${feature.description.slice(
+        0,
+        50
+      )}${feature.description.length > 50 ? "..." : ""}`,
     });
   };
 
   // Open follow-up dialog for waiting_approval features
   const handleOpenFollowUp = (feature: Feature) => {
-    console.log("[Board] Opening follow-up dialog for feature:", { id: feature.id, description: feature.description });
+    console.log("[Board] Opening follow-up dialog for feature:", {
+      id: feature.id,
+      description: feature.description,
+    });
     setFollowUpFeature(feature);
     setFollowUpPrompt("");
     setFollowUpImagePaths([]);
@@ -723,12 +824,12 @@ export function BoardView() {
     const featureId = followUpFeature.id;
     const featureDescription = followUpFeature.description;
     const prompt = followUpPrompt;
-    const imagePaths = followUpImagePaths.map(img => img.path);
+    const imagePaths = followUpImagePaths.map((img) => img.path);
 
     console.log("[Board] Sending follow-up prompt for feature:", {
       id: featureId,
       prompt: prompt,
-      imagePaths: imagePaths
+      imagePaths: imagePaths,
     });
 
     const api = getElectronAPI();
@@ -741,7 +842,10 @@ export function BoardView() {
     }
 
     // Move feature back to in_progress before sending follow-up
-    updateFeature(featureId, { status: "in_progress", startedAt: new Date().toISOString() });
+    updateFeature(featureId, {
+      status: "in_progress",
+      startedAt: new Date().toISOString(),
+    });
 
     // Reset follow-up state immediately (close dialog, clear form)
     setShowFollowUpDialog(false);
@@ -751,30 +855,33 @@ export function BoardView() {
 
     // Show success toast immediately
     toast.success("Follow-up started", {
-      description: `Continuing work on: ${featureDescription.slice(0, 50)}${featureDescription.length > 50 ? "..." : ""}`,
+      description: `Continuing work on: ${featureDescription.slice(0, 50)}${
+        featureDescription.length > 50 ? "..." : ""
+      }`,
     });
 
     // Call the API in the background (don't await - let it run async)
-    api.autoMode.followUpFeature(
-      currentProject.path,
-      featureId,
-      prompt,
-      imagePaths
-    ).catch((error) => {
-      console.error("[Board] Error sending follow-up:", error);
-      toast.error("Failed to send follow-up", {
-        description: error instanceof Error ? error.message : "An error occurred",
+    api.autoMode
+      .followUpFeature(currentProject.path, featureId, prompt, imagePaths)
+      .catch((error) => {
+        console.error("[Board] Error sending follow-up:", error);
+        toast.error("Failed to send follow-up", {
+          description:
+            error instanceof Error ? error.message : "An error occurred",
+        });
+        // Reload features to revert status if there was an error
+        loadFeatures();
       });
-      // Reload features to revert status if there was an error
-      loadFeatures();
-    });
   };
 
   // Handle commit-only for waiting_approval features (marks as verified and commits)
   const handleCommitFeature = async (feature: Feature) => {
     if (!currentProject) return;
 
-    console.log("[Board] Committing feature:", { id: feature.id, description: feature.description });
+    console.log("[Board] Committing feature:", {
+      id: feature.id,
+      description: feature.description,
+    });
 
     try {
       const api = getElectronAPI();
@@ -797,7 +904,10 @@ export function BoardView() {
         // Move to verified status
         moveFeature(feature.id, "verified");
         toast.success("Feature committed", {
-          description: `Committed and verified: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`,
+          description: `Committed and verified: ${feature.description.slice(
+            0,
+            50
+          )}${feature.description.length > 50 ? "..." : ""}`,
         });
       } else {
         console.error("[Board] Failed to commit feature:", result.error);
@@ -809,7 +919,8 @@ export function BoardView() {
     } catch (error) {
       console.error("[Board] Error committing feature:", error);
       toast.error("Failed to commit feature", {
-        description: error instanceof Error ? error.message : "An error occurred",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
       });
       await loadFeatures();
     }
@@ -817,10 +928,15 @@ export function BoardView() {
 
   // Move feature to waiting_approval (for skipTests features when agent completes)
   const handleMoveToWaitingApproval = (feature: Feature) => {
-    console.log("[Board] Moving feature to waiting_approval:", { id: feature.id, description: feature.description });
+    console.log("[Board] Moving feature to waiting_approval:", {
+      id: feature.id,
+      description: feature.description,
+    });
     updateFeature(feature.id, { status: "waiting_approval" });
     toast.info("Feature ready for review", {
-      description: `Ready for approval: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`,
+      description: `Ready for approval: ${feature.description.slice(0, 50)}${
+        feature.description.length > 50 ? "..." : ""
+      }`,
     });
   };
 
@@ -863,28 +979,31 @@ export function BoardView() {
   };
 
   // Handle number key press when output modal is open
-  const handleOutputModalNumberKeyPress = useCallback((key: string) => {
-    // Convert key to index: 1-9 -> 0-8, 0 -> 9
-    const index = key === "0" ? 9 : parseInt(key, 10) - 1;
+  const handleOutputModalNumberKeyPress = useCallback(
+    (key: string) => {
+      // Convert key to index: 1-9 -> 0-8, 0 -> 9
+      const index = key === "0" ? 9 : parseInt(key, 10) - 1;
 
-    // Get the feature at that index from in-progress features
-    const targetFeature = inProgressFeaturesForShortcuts[index];
+      // Get the feature at that index from in-progress features
+      const targetFeature = inProgressFeaturesForShortcuts[index];
 
-    if (!targetFeature) {
-      // No feature at this index, do nothing
-      return;
-    }
+      if (!targetFeature) {
+        // No feature at this index, do nothing
+        return;
+      }
 
-    // If pressing the same number key as the currently open feature, close the modal
-    if (targetFeature.id === outputFeature?.id) {
-      setShowOutputModal(false);
-    }
-    // If pressing a different number key, switch to that feature's output
-    else {
-      setOutputFeature(targetFeature);
-      // Modal stays open, just showing different content
-    }
-  }, [inProgressFeaturesForShortcuts, outputFeature?.id]);
+      // If pressing the same number key as the currently open feature, close the modal
+      if (targetFeature.id === outputFeature?.id) {
+        setShowOutputModal(false);
+      }
+      // If pressing a different number key, switch to that feature's output
+      else {
+        setOutputFeature(targetFeature);
+        // Modal stays open, just showing different content
+      }
+    },
+    [inProgressFeaturesForShortcuts, outputFeature?.id]
+  );
 
   const handleForceStopFeature = async (feature: Feature) => {
     try {
@@ -894,23 +1013,31 @@ export function BoardView() {
       // - If it's a skipTests feature that was in waiting_approval (i.e., during commit operation),
       //   move it back to waiting_approval so user can try commit again or do follow-up
       // - Otherwise, move to backlog
-      const targetStatus = feature.skipTests && feature.status === "waiting_approval"
-        ? "waiting_approval"
-        : "backlog";
+      const targetStatus =
+        feature.skipTests && feature.status === "waiting_approval"
+          ? "waiting_approval"
+          : "backlog";
 
       if (targetStatus !== feature.status) {
         moveFeature(feature.id, targetStatus);
       }
 
       toast.success("Agent stopped", {
-        description: targetStatus === "waiting_approval"
-          ? `Stopped commit - returned to waiting approval: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`
-          : `Stopped working on: ${feature.description.slice(0, 50)}${feature.description.length > 50 ? "..." : ""}`,
+        description:
+          targetStatus === "waiting_approval"
+            ? `Stopped commit - returned to waiting approval: ${feature.description.slice(
+                0,
+                50
+              )}${feature.description.length > 50 ? "..." : ""}`
+            : `Stopped working on: ${feature.description.slice(0, 50)}${
+                feature.description.length > 50 ? "..." : ""
+              }`,
       });
     } catch (error) {
       console.error("[Board] Error stopping feature:", error);
       toast.error("Failed to stop agent", {
-        description: error instanceof Error ? error.message : "An error occurred",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
       });
     }
   };
@@ -922,7 +1049,9 @@ export function BoardView() {
 
     if (availableSlots <= 0) {
       toast.error("Concurrency limit reached", {
-        description: `You can only have ${maxConcurrency} task${maxConcurrency > 1 ? "s" : ""} running at a time. Wait for a task to complete or increase the limit.`,
+        description: `You can only have ${maxConcurrency} task${
+          maxConcurrency > 1 ? "s" : ""
+        } running at a time. Wait for a task to complete or increase the limit.`,
       });
       return;
     }
@@ -938,14 +1067,28 @@ export function BoardView() {
 
     for (const feature of featuresToStart) {
       // Update the feature status with startedAt timestamp
-      updateFeature(feature.id, { status: "in_progress", startedAt: new Date().toISOString() });
+      updateFeature(feature.id, {
+        status: "in_progress",
+        startedAt: new Date().toISOString(),
+      });
       // Start the agent for this feature
       await handleRunFeature(feature);
     }
 
-    toast.success(`Started ${featuresToStart.length} feature${featuresToStart.length > 1 ? "s" : ""}`, {
-      description: featuresToStart.map((f) => f.description.slice(0, 30) + (f.description.length > 30 ? "..." : "")).join(", "),
-    });
+    toast.success(
+      `Started ${featuresToStart.length} feature${
+        featuresToStart.length > 1 ? "s" : ""
+      }`,
+      {
+        description: featuresToStart
+          .map(
+            (f) =>
+              f.description.slice(0, 30) +
+              (f.description.length > 30 ? "..." : "")
+          )
+          .join(", "),
+      }
+    );
   }, [features, maxConcurrency, runningAutoTasks.length, updateFeature]);
 
   // Update ref when handleStartNextFeatures changes
@@ -981,7 +1124,7 @@ export function BoardView() {
       data-testid="board-view"
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-white/10 bg-zinc-950/50 backdrop-blur-md">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-glass backdrop-blur-md">
         <div>
           <h1 className="text-xl font-bold">Kanban Board</h1>
           <p className="text-sm text-muted-foreground">{currentProject.name}</p>
@@ -990,10 +1133,10 @@ export function BoardView() {
           {/* Concurrency Slider - only show after mount to prevent hydration issues */}
           {isMounted && (
             <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary border border-border"
               data-testid="concurrency-slider-container"
             >
-              <Users className="w-4 h-4 text-zinc-400" />
+              <Users className="w-4 h-4 text-muted-foreground" />
               <Slider
                 value={[maxConcurrency]}
                 onValueChange={(value) => setMaxConcurrency(value[0])}
@@ -1004,7 +1147,7 @@ export function BoardView() {
                 data-testid="concurrency-slider"
               />
               <span
-                className="text-sm text-zinc-400 min-w-[2ch] text-center"
+                className="text-sm text-muted-foreground min-w-[2ch] text-center"
                 data-testid="concurrency-value"
               >
                 {maxConcurrency}
@@ -1027,11 +1170,10 @@ export function BoardView() {
                 </Button>
               ) : (
                 <Button
-                  variant="default"
+                  variant="secondary"
                   size="sm"
                   onClick={() => autoMode.start()}
                   data-testid="start-auto-mode"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
                 >
                   <Play className="w-4 h-4 mr-2" />
                   Auto Mode
@@ -1077,112 +1219,119 @@ export function BoardView() {
       {/* Main Content Area */}
       <div className="flex-1 flex overflow-hidden">
         {/* Kanban Columns */}
-        <div className={cn(
-          "flex-1 overflow-x-auto p-4",
-          showActivityLog && "transition-all"
-        )}>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={collisionDetectionStrategy}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
+        <div
+          className={cn(
+            "flex-1 overflow-x-auto p-4",
+            showActivityLog && "transition-all"
+          )}
         >
-          <div className="flex gap-4 h-full min-w-max">
-            {COLUMNS.map((column) => {
-              const columnFeatures = getColumnFeatures(column.id);
-              return (
-                <KanbanColumn
-                  key={column.id}
-                  id={column.id}
-                  title={column.title}
-                  color={column.color}
-                  count={columnFeatures.length}
-                  isDoubleWidth={column.id === "in_progress"}
-                  headerAction={
-                    column.id === "verified" && columnFeatures.length > 0 ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => setShowDeleteAllVerifiedDialog(true)}
-                        data-testid="delete-all-verified-button"
-                      >
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Delete All
-                      </Button>
-                    ) : column.id === "backlog" && columnFeatures.length > 0 ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10"
-                        onClick={handleStartNextFeatures}
-                        data-testid="start-next-button"
-                      >
-                        <FastForward className="w-3 h-3 mr-1" />
-                        Start Next
-                        <span className="ml-1 px-1 py-0.5 text-[9px] font-mono rounded bg-white/10 border border-white/20">
-                          {ACTION_SHORTCUTS.startNext}
-                        </span>
-                      </Button>
-                    ) : undefined
-                  }
-                >
-                  <SortableContext
-                    items={columnFeatures.map((f) => f.id)}
-                    strategy={verticalListSortingStrategy}
+          <DndContext
+            sensors={sensors}
+            collisionDetection={collisionDetectionStrategy}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-4 h-full min-w-max">
+              {COLUMNS.map((column) => {
+                const columnFeatures = getColumnFeatures(column.id);
+                return (
+                  <KanbanColumn
+                    key={column.id}
+                    id={column.id}
+                    title={column.title}
+                    color={column.color}
+                    count={columnFeatures.length}
+                    isDoubleWidth={column.id === "in_progress"}
+                    headerAction={
+                      column.id === "verified" && columnFeatures.length > 0 ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => setShowDeleteAllVerifiedDialog(true)}
+                          data-testid="delete-all-verified-button"
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Delete All
+                        </Button>
+                      ) : column.id === "backlog" &&
+                        columnFeatures.length > 0 ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs text-primary hover:text-primary hover:bg-primary/10"
+                          onClick={handleStartNextFeatures}
+                          data-testid="start-next-button"
+                        >
+                          <FastForward className="w-3 h-3 mr-1" />
+                          Start Next
+                          <span className="ml-1 px-1 py-0.5 text-[9px] font-mono rounded bg-white/10 border border-white/20">
+                            {ACTION_SHORTCUTS.startNext}
+                          </span>
+                        </Button>
+                      ) : undefined
+                    }
                   >
-                    {columnFeatures.map((feature, index) => {
-                      // Calculate shortcut key for in-progress cards (first 10 get 1-9, 0)
-                      let shortcutKey: string | undefined;
-                      if (column.id === "in_progress" && index < 10) {
-                        shortcutKey = index === 9 ? "0" : String(index + 1);
-                      }
-                      return (
-                        <KanbanCard
-                          key={feature.id}
-                          feature={feature}
-                          onEdit={() => setEditingFeature(feature)}
-                          onDelete={() => handleDeleteFeature(feature.id)}
-                          onViewOutput={() => handleViewOutput(feature)}
-                          onVerify={() => handleVerifyFeature(feature)}
-                          onResume={() => handleResumeFeature(feature)}
-                          onForceStop={() => handleForceStopFeature(feature)}
-                          onManualVerify={() => handleManualVerify(feature)}
-                          onMoveBackToInProgress={() => handleMoveBackToInProgress(feature)}
-                          onFollowUp={() => handleOpenFollowUp(feature)}
-                          onCommit={() => handleCommitFeature(feature)}
-                          hasContext={featuresWithContext.has(feature.id)}
-                          isCurrentAutoTask={runningAutoTasks.includes(feature.id)}
-                          shortcutKey={shortcutKey}
-                        />
-                      );
-                    })}
-                  </SortableContext>
-                </KanbanColumn>
-              );
-            })}
-          </div>
+                    <SortableContext
+                      items={columnFeatures.map((f) => f.id)}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {columnFeatures.map((feature, index) => {
+                        // Calculate shortcut key for in-progress cards (first 10 get 1-9, 0)
+                        let shortcutKey: string | undefined;
+                        if (column.id === "in_progress" && index < 10) {
+                          shortcutKey = index === 9 ? "0" : String(index + 1);
+                        }
+                        return (
+                          <KanbanCard
+                            key={feature.id}
+                            feature={feature}
+                            onEdit={() => setEditingFeature(feature)}
+                            onDelete={() => handleDeleteFeature(feature.id)}
+                            onViewOutput={() => handleViewOutput(feature)}
+                            onVerify={() => handleVerifyFeature(feature)}
+                            onResume={() => handleResumeFeature(feature)}
+                            onForceStop={() => handleForceStopFeature(feature)}
+                            onManualVerify={() => handleManualVerify(feature)}
+                            onMoveBackToInProgress={() =>
+                              handleMoveBackToInProgress(feature)
+                            }
+                            onFollowUp={() => handleOpenFollowUp(feature)}
+                            onCommit={() => handleCommitFeature(feature)}
+                            hasContext={featuresWithContext.has(feature.id)}
+                            isCurrentAutoTask={runningAutoTasks.includes(
+                              feature.id
+                            )}
+                            shortcutKey={shortcutKey}
+                          />
+                        );
+                      })}
+                    </SortableContext>
+                  </KanbanColumn>
+                );
+              })}
+            </div>
 
-          <DragOverlay>
-            {activeFeature && (
-              <Card className="w-72 opacity-90 rotate-3 shadow-xl">
-                <CardHeader className="p-3">
-                  <CardTitle className="text-sm">
-                    {activeFeature.description}
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    {activeFeature.category}
-                  </CardDescription>
-                </CardHeader>
-              </Card>
-            )}
-          </DragOverlay>
-        </DndContext>
+            <DragOverlay>
+              {activeFeature && (
+                <Card className="w-72 opacity-90 rotate-3 shadow-xl">
+                  <CardHeader className="p-3">
+                    <CardTitle className="text-sm">
+                      {activeFeature.description}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {activeFeature.category}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              )}
+            </DragOverlay>
+          </DndContext>
         </div>
 
         {/* Activity Log Panel */}
         {showActivityLog && (
-          <div className="w-96 border-l border-white/10 flex-shrink-0">
+          <div className="w-96 border-l border-border flex-shrink-0">
             <AutoModeLog onClose={() => setShowActivityLog(false)} />
           </div>
         )}
@@ -1194,7 +1343,11 @@ export function BoardView() {
           compact={!isMaximized}
           data-testid="add-feature-dialog"
           onKeyDown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && newFeature.description) {
+            if (
+              (e.metaKey || e.ctrlKey) &&
+              e.key === "Enter" &&
+              newFeature.description
+            ) {
               e.preventDefault();
               handleAddFeature();
             }
@@ -1280,7 +1433,8 @@ export function BoardView() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground mb-4">
-              When enabled, this feature will require manual verification instead of automated TDD.
+              When enabled, this feature will require manual verification
+              instead of automated TDD.
             </p>
 
             {/* Model Selection */}
@@ -1451,19 +1605,26 @@ export function BoardView() {
                   id="edit-skip-tests"
                   checked={editingFeature.skipTests ?? false}
                   onCheckedChange={(checked) =>
-                    setEditingFeature({ ...editingFeature, skipTests: checked === true })
+                    setEditingFeature({
+                      ...editingFeature,
+                      skipTests: checked === true,
+                    })
                   }
                   data-testid="edit-skip-tests-checkbox"
                 />
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="edit-skip-tests" className="text-sm cursor-pointer">
+                  <Label
+                    htmlFor="edit-skip-tests"
+                    className="text-sm cursor-pointer"
+                  >
                     Skip automated testing
                   </Label>
                   <FlaskConical className="w-3.5 h-3.5 text-muted-foreground" />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mb-4">
-                When enabled, this feature will require manual verification instead of automated TDD.
+                When enabled, this feature will require manual verification
+                instead of automated TDD.
               </p>
 
               {/* Model Selection */}
@@ -1563,21 +1724,29 @@ export function BoardView() {
       />
 
       {/* Delete All Verified Dialog */}
-      <Dialog open={showDeleteAllVerifiedDialog} onOpenChange={setShowDeleteAllVerifiedDialog}>
+      <Dialog
+        open={showDeleteAllVerifiedDialog}
+        onOpenChange={setShowDeleteAllVerifiedDialog}
+      >
         <DialogContent data-testid="delete-all-verified-dialog">
           <DialogHeader>
             <DialogTitle>Delete All Verified Features</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete all verified features? This action cannot be undone.
+              Are you sure you want to delete all verified features? This action
+              cannot be undone.
               {getColumnFeatures("verified").length > 0 && (
                 <span className="block mt-2 text-yellow-500">
-                  {getColumnFeatures("verified").length} feature(s) will be deleted.
+                  {getColumnFeatures("verified").length} feature(s) will be
+                  deleted.
                 </span>
               )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => setShowDeleteAllVerifiedDialog(false)}>
+            <Button
+              variant="ghost"
+              onClick={() => setShowDeleteAllVerifiedDialog(false)}
+            >
               Cancel
             </Button>
             <Button
@@ -1593,7 +1762,10 @@ export function BoardView() {
                     try {
                       await autoMode.stopFeature(feature.id);
                     } catch (error) {
-                      console.error("[Board] Error stopping feature before delete:", error);
+                      console.error(
+                        "[Board] Error stopping feature before delete:",
+                        error
+                      );
                     }
                   }
 
@@ -1616,19 +1788,26 @@ export function BoardView() {
       </Dialog>
 
       {/* Follow-Up Prompt Dialog */}
-      <Dialog open={showFollowUpDialog} onOpenChange={(open) => {
-        if (!open) {
-          setShowFollowUpDialog(false);
-          setFollowUpFeature(null);
-          setFollowUpPrompt("");
-          setFollowUpImagePaths([]);
-        }
-      }}>
+      <Dialog
+        open={showFollowUpDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setShowFollowUpDialog(false);
+            setFollowUpFeature(null);
+            setFollowUpPrompt("");
+            setFollowUpImagePaths([]);
+          }
+        }}
+      >
         <DialogContent
           compact={!isMaximized}
           data-testid="follow-up-dialog"
           onKeyDown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === "Enter" && followUpPrompt.trim()) {
+            if (
+              (e.metaKey || e.ctrlKey) &&
+              e.key === "Enter" &&
+              followUpPrompt.trim()
+            ) {
               e.preventDefault();
               handleSendFollowUp();
             }
@@ -1640,7 +1819,8 @@ export function BoardView() {
               Send additional instructions to continue working on this feature.
               {followUpFeature && (
                 <span className="block mt-2 text-primary">
-                  Feature: {followUpFeature.description.slice(0, 100)}{followUpFeature.description.length > 100 ? "..." : ""}
+                  Feature: {followUpFeature.description.slice(0, 100)}
+                  {followUpFeature.description.length > 100 ? "..." : ""}
                 </span>
               )}
             </DialogDescription>
@@ -1657,17 +1837,20 @@ export function BoardView() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              The agent will continue from where it left off, using the existing context.
-              You can attach screenshots to help explain the issue.
+              The agent will continue from where it left off, using the existing
+              context. You can attach screenshots to help explain the issue.
             </p>
           </div>
           <DialogFooter>
-            <Button variant="ghost" onClick={() => {
-              setShowFollowUpDialog(false);
-              setFollowUpFeature(null);
-              setFollowUpPrompt("");
-              setFollowUpImagePaths([]);
-            }}>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setShowFollowUpDialog(false);
+                setFollowUpFeature(null);
+                setFollowUpPrompt("");
+                setFollowUpImagePaths([]);
+              }}
+            >
               Cancel
             </Button>
             <Button
@@ -1677,9 +1860,7 @@ export function BoardView() {
             >
               <MessageSquare className="w-4 h-4 mr-2" />
               Send Follow-Up
-              <span
-                className="ml-2 px-1.5 py-0.5 text-[10px] font-mono rounded bg-white/10 border border-white/20"
-              >
+              <span className="ml-2 px-1.5 py-0.5 text-[10px] font-mono rounded bg-white/10 border border-white/20">
                 ⌘↵
               </span>
             </Button>

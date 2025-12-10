@@ -264,7 +264,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "flex-shrink-0 border-r border-white/10 bg-zinc-950/50 backdrop-blur-md flex flex-col z-30 transition-all duration-300 relative",
+        "flex-shrink-0 border-r border-sidebar-border bg-sidebar backdrop-blur-md flex flex-col z-30 transition-all duration-300 relative",
         sidebarOpen ? "w-16 lg:w-60" : "w-16"
       )}
       data-testid="sidebar"
@@ -272,7 +272,7 @@ export function Sidebar() {
       {/* Floating Collapse Toggle Button - Desktop only - At border intersection */}
       <button
         onClick={toggleSidebar}
-        className="hidden lg:flex absolute top-[68px] -right-3 z-[9999] group/toggle items-center justify-center w-6 h-6 rounded-full bg-zinc-800 border border-white/10 text-zinc-400 hover:text-white hover:bg-zinc-700 hover:border-white/20 transition-all shadow-lg titlebar-no-drag"
+        className="hidden lg:flex absolute top-[68px] -right-3 z-9999 group/toggle items-center justify-center w-6 h-6 rounded-full bg-sidebar-accent border border-border text-muted-foreground hover:text-foreground hover:bg-accent hover:border-border transition-all shadow-lg titlebar-no-drag"
         data-testid="sidebar-collapse-button"
       >
         {sidebarOpen ? (
@@ -282,12 +282,12 @@ export function Sidebar() {
         )}
         {/* Tooltip */}
         <div
-          className="absolute left-full ml-2 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover/toggle:opacity-100 transition-opacity whitespace-nowrap z-50 border border-zinc-700 pointer-events-none"
+          className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover/toggle:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border pointer-events-none"
           data-testid="sidebar-toggle-tooltip"
         >
           {sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}{" "}
           <span
-            className="ml-1 px-1 py-0.5 bg-white/10 rounded text-[10px] font-mono"
+            className="ml-1 px-1 py-0.5 bg-sidebar-accent/10 rounded text-[10px] font-mono"
             data-testid="sidebar-toggle-shortcut"
           >
             {UI_SHORTCUTS.toggleSidebar}
@@ -299,7 +299,7 @@ export function Sidebar() {
         {/* Logo */}
         <div
           className={cn(
-            "h-20 pt-8 flex items-center justify-center border-b border-zinc-800 flex-shrink-0 titlebar-drag-region",
+            "h-20 pt-8 flex items-center justify-center border-b border-sidebar-border shrink-0 titlebar-drag-region",
             sidebarOpen ? "px-3 lg:px-6" : "px-3"
           )}
         >
@@ -308,12 +308,12 @@ export function Sidebar() {
             onClick={() => setCurrentView("welcome")}
             data-testid="logo-button"
           >
-            <div className="relative flex items-center justify-center w-8 h-8 bg-gradient-to-br from-brand-500 to-purple-600 rounded-lg shadow-lg shadow-brand-500/20 group">
-              <Cpu className="text-white w-5 h-5 group-hover:rotate-12 transition-transform" />
+            <div className="relative flex items-center justify-center w-8 h-8 bg-linear-to-br from-brand-500 to-brand-600 rounded-lg shadow-lg shadow-brand-500/20 group">
+              <Cpu className="text-primary-foreground w-5 h-5 group-hover:rotate-12 transition-transform" />
             </div>
             <span
               className={cn(
-                "ml-3 font-bold text-white text-base tracking-tight",
+                "ml-3 font-bold text-sidebar-foreground text-base tracking-tight",
                 sidebarOpen ? "hidden lg:block" : "hidden"
               )}
             >
@@ -327,7 +327,7 @@ export function Sidebar() {
           <div className="flex items-center gap-2 titlebar-no-drag px-2 mt-3">
             <button
               onClick={() => setCurrentView("welcome")}
-              className="group flex items-center justify-center flex-1 px-3 py-2.5 rounded-lg relative overflow-hidden transition-all text-zinc-400 hover:text-white hover:bg-white/5 border border-white/10"
+              className="group flex items-center justify-center flex-1 px-3 py-2.5 rounded-lg relative overflow-hidden transition-all text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 border border-sidebar-border"
               title="New Project"
               data-testid="new-project-button"
             >
@@ -338,11 +338,11 @@ export function Sidebar() {
             </button>
             <button
               onClick={handleOpenFolder}
-              className="group flex items-center justify-center flex-1 px-3 py-2.5 rounded-lg relative overflow-hidden transition-all text-zinc-400 hover:text-white hover:bg-white/5 border border-white/10"
+              className="group flex items-center justify-center flex-1 px-3 py-2.5 rounded-lg relative overflow-hidden transition-all text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50 border border-sidebar-border"
               title={`Open Folder (${ACTION_SHORTCUTS.openProject})`}
               data-testid="open-project-button"
             >
-              <FolderOpen className="w-4 h-4 flex-shrink-0" />
+              <FolderOpen className="w-4 h-4 shrink-0" />
               <span className="ml-2 text-sm font-medium hidden lg:block whitespace-nowrap">
                 Open
               </span>
@@ -362,28 +362,28 @@ export function Sidebar() {
             >
               <DropdownMenuTrigger asChild>
                 <button
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-white titlebar-no-drag"
+                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg bg-sidebar-accent/10 border border-sidebar-border hover:bg-sidebar-accent/20 transition-all text-foreground titlebar-no-drag"
                   data-testid="project-selector"
                 >
                   <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <Folder className="h-4 w-4 text-brand-500 flex-shrink-0" />
+                    <Folder className="h-4 w-4 text-brand-500 shrink-0" />
                     <span className="text-sm font-medium truncate">
                       {currentProject?.name || "Select Project"}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span
-                      className="hidden lg:flex items-center justify-center w-5 h-5 text-[10px] font-mono rounded bg-white/5 border border-white/10 text-zinc-500"
+                      className="hidden lg:flex items-center justify-center w-5 h-5 text-[10px] font-mono rounded bg-sidebar-accent/10 border border-sidebar-border text-muted-foreground"
                       data-testid="project-picker-shortcut"
                     >
                       {ACTION_SHORTCUTS.projectPicker}
                     </span>
-                    <ChevronDown className="h-4 w-4 text-zinc-400 flex-shrink-0" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0" />
                   </div>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                className="w-56 bg-zinc-800 border-zinc-700"
+                className="w-56 bg-popover border-border"
                 align="start"
                 data-testid="project-picker-dropdown"
               >
@@ -394,12 +394,12 @@ export function Sidebar() {
                       setCurrentProject(project);
                       setIsProjectPickerOpen(false);
                     }}
-                    className="flex items-center gap-2 cursor-pointer text-zinc-300 hover:text-white hover:bg-zinc-700/50"
+                    className="flex items-center gap-2 cursor-pointer text-muted-foreground hover:text-foreground hover:bg-accent"
                     data-testid={`project-option-${project.id}`}
                   >
                     {index < 9 && (
                       <span
-                        className="flex items-center justify-center w-5 h-5 text-[10px] font-mono rounded bg-white/5 border border-white/10 text-zinc-400"
+                        className="flex items-center justify-center w-5 h-5 text-[10px] font-mono rounded bg-sidebar-accent/10 border border-sidebar-border text-muted-foreground"
                         data-testid={`project-hotkey-${index + 1}`}
                       >
                         {index + 1}
@@ -422,7 +422,7 @@ export function Sidebar() {
           {!currentProject && sidebarOpen ? (
             // Placeholder when no project is selected (only in expanded state)
             <div className="flex items-center justify-center h-full px-4">
-              <p className="text-zinc-500 text-sm text-center">
+              <p className="text-muted-foreground text-sm text-center">
                 <span className="hidden lg:block">
                   Select or create a project above
                 </span>
@@ -435,13 +435,13 @@ export function Sidebar() {
                 {/* Section Label */}
                 {section.label && sidebarOpen && (
                   <div className="hidden lg:block px-4 mb-2">
-                    <span className="text-[10px] font-semibold text-zinc-500 uppercase tracking-wider">
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
                       {section.label}
                     </span>
                   </div>
                 )}
                 {section.label && !sidebarOpen && (
-                  <div className="h-px bg-zinc-800 mx-2 mb-2"></div>
+                  <div className="h-px bg-sidebar-border mx-2 mb-2"></div>
                 )}
 
                 {/* Nav Items */}
@@ -457,8 +457,8 @@ export function Sidebar() {
                         className={cn(
                           "group flex items-center w-full px-2 lg:px-3 py-2.5 rounded-lg relative overflow-hidden transition-all titlebar-no-drag",
                           isActive
-                            ? "bg-white/5 text-white border border-white/10"
-                            : "text-zinc-400 hover:text-white hover:bg-white/5",
+                            ? "bg-sidebar-accent/50 text-foreground border border-sidebar-border"
+                            : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50",
                           !sidebarOpen && "justify-center"
                         )}
                         title={!sidebarOpen ? item.label : undefined}
@@ -469,7 +469,7 @@ export function Sidebar() {
                         )}
                         <Icon
                           className={cn(
-                            "w-4 h-4 flex-shrink-0 transition-colors",
+                            "w-4 h-4 shrink-0 transition-colors",
                             isActive
                               ? "text-brand-500"
                               : "group-hover:text-brand-400"
@@ -515,7 +515,7 @@ export function Sidebar() {
       </div>
 
       {/* Bottom Section - User / Settings */}
-      <div className="border-t border-zinc-800 bg-zinc-900/50 flex-shrink-0">
+      <div className="border-t border-sidebar-border bg-sidebar-accent/10 shrink-0">
         {/* Settings Link */}
         <div className="p-2">
           <button
@@ -523,8 +523,8 @@ export function Sidebar() {
             className={cn(
               "group flex items-center w-full px-2 lg:px-3 py-2.5 rounded-lg relative overflow-hidden transition-all titlebar-no-drag",
               isActiveRoute("settings")
-                ? "bg-white/5 text-white border border-white/10"
-                : "text-zinc-400 hover:text-white hover:bg-white/5",
+                ? "bg-sidebar-accent/50 text-foreground border border-sidebar-border"
+                : "text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50",
               sidebarOpen ? "justify-start" : "justify-center"
             )}
             title={!sidebarOpen ? "Settings" : undefined}
@@ -535,7 +535,7 @@ export function Sidebar() {
             )}
             <Settings
               className={cn(
-                "w-4 h-4 flex-shrink-0 transition-colors",
+                "w-4 h-4 shrink-0 transition-colors",
                 isActiveRoute("settings")
                   ? "text-brand-500"
                   : "group-hover:text-brand-400"
@@ -562,7 +562,7 @@ export function Sidebar() {
               </span>
             )}
             {!sidebarOpen && (
-              <span className="absolute left-full ml-2 px-2 py-1 bg-zinc-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-zinc-700">
+              <span className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-border">
                 Settings
               </span>
             )}
