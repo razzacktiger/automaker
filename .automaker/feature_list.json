@@ -71,5 +71,33 @@
     "startedAt": "2025-12-09T22:31:41.946Z",
     "imagePaths": [],
     "skipTests": true
+  },
+  {
+    "id": "feature-1765325001000-650s5id2p",
+    "category": "Settings",
+    "description": "Fix the design of this section to use the theme we have elsewhere",
+    "steps": [],
+    "status": "waiting_approval",
+    "imagePaths": [
+      {
+        "id": "img-1765324985005-gq72u8269",
+        "path": "/var/folders/yk/56l0_s6978qfh521xf1dtx3r0000gn/T/automaker-images/1765324985003_Screenshot_2025-12-09_at_7.02.57_PM.png",
+        "filename": "Screenshot 2025-12-09 at 7.02.57 PM.png",
+        "mimeType": "image/png"
+      }
+    ],
+    "skipTests": true,
+    "summary": "Fixed Settings View to use consistent theme variables. Modified: settings-view.tsx. Changes: Kanban Card Display section now uses theme-aware classes (border-border, bg-card, text-foreground, text-muted-foreground, bg-accent, bg-input) instead of hardcoded dark theme colors (text-zinc-*, bg-zinc-*, border-white/*, text-white). Also fixed Back to Home button and API key help text styling."
+  },
+  {
+    "id": "feature-1765325422436-et1qhb1zy",
+    "category": "Kanban",
+    "description": "reduce width of in progress to 1 column no masonry",
+    "steps": [],
+    "status": "waiting_approval",
+    "startedAt": "2025-12-10T00:10:23.784Z",
+    "imagePaths": [],
+    "skipTests": true,
+    "summary": "Reduced In Progress column width from double-width (37rem) to single column (w-72). Removed masonry 2-column layout. Modified: kanban-column.tsx (removed isDoubleWidth prop, simplified styling), board-view.tsx (removed isDoubleWidth prop from KanbanColumn). All columns now have uniform width with simple vertical card stacking."
   }
 ]

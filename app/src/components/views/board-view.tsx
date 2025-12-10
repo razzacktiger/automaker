@@ -1223,7 +1223,6 @@ export function BoardView() {
                     title={column.title}
                     color={column.color}
                     count={columnFeatures.length}
-                    isDoubleWidth={column.id === "in_progress"}
                     headerAction={
                       column.id === "verified" && columnFeatures.length > 0 ? (
                         <Button
