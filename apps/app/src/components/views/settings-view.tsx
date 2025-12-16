@@ -11,6 +11,7 @@ import { DeleteProjectDialog } from "./settings-view/components/delete-project-d
 import { SettingsNavigation } from "./settings-view/components/settings-navigation";
 import { ApiKeysSection } from "./settings-view/api-keys/api-keys-section";
 import { ClaudeCliStatus } from "./settings-view/cli-status/claude-cli-status";
+import { AIEnhancementSection } from "./settings-view/ai-enhancement";
 import { AppearanceSection } from "./settings-view/appearance/appearance-section";
 import { AudioSection } from "./settings-view/audio/audio-section";
 import { KeyboardShortcutsSection } from "./settings-view/keyboard-shortcuts/keyboard-shortcuts-section";
@@ -89,6 +90,8 @@ export function SettingsView() {
             onRefresh={handleRefreshClaudeCli}
           />
         );
+      case "ai-enhancement":
+        return <AIEnhancementSection />;
       case "appearance":
         return (
           <AppearanceSection

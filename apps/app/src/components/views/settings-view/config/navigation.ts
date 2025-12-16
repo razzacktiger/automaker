@@ -7,6 +7,7 @@ import {
   Volume2,
   FlaskConical,
   Trash2,
+  Sparkles,
 } from "lucide-react";
 import type { SettingsViewId } from "../hooks/use-settings-view";
 
@@ -20,6 +21,7 @@ export interface NavigationItem {
 export const NAV_ITEMS: NavigationItem[] = [
   { id: "api-keys", label: "API Keys", icon: Key },
   { id: "claude", label: "Claude", icon: Terminal },
+  { id: "ai-enhancement", label: "AI Enhancement", icon: Sparkles },
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "keyboard", label: "Keyboard Shortcuts", icon: Settings2 },
   { id: "audio", label: "Audio", icon: Volume2 },
