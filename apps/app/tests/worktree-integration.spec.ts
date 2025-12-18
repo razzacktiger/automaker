@@ -741,14 +741,15 @@ test.describe("Worktree Integration Tests", () => {
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
 
-    // Create a worktree first
+    // Note: Worktrees are created at execution time (when feature starts),
+    // not when adding to backlog. We can specify a branch name without
+    // creating a worktree first.
     const branchName = "feature/test-branch";
-    await apiCreateWorktree(page, testRepo.path, branchName);
 
     // Click add feature button
     await clickAddFeature(page);
 
-    // Fill in the feature details
+    // Fill in the feature details with a branch name
     await fillAddFeatureDialog(page, "Test feature for worktree", {
       branch: branchName,
       category: "Testing",
@@ -773,9 +774,12 @@ test.describe("Worktree Integration Tests", () => {
     expect(featureData.description).toBe("Test feature for worktree");
     expect(featureData.branchName).toBe(branchName);
     expect(featureData.status).toBe("backlog");
+    // Verify worktreePath is not set when adding to backlog
+    // (worktrees are created at execution time, not when adding to backlog)
+    expect(featureData.worktreePath).toBeUndefined();
   });
 
-  test("should create worktree automatically when adding feature with new branch", async ({
+  test("should store branch name when adding feature with new branch (worktree created at execution)", async ({
     page,
   }) => {
     await setupProjectWithPath(page, testRepo.path);
@@ -783,12 +787,13 @@ test.describe("Worktree Integration Tests", () => {
     await waitForNetworkIdle(page);
     await waitForBoardView(page);
 
-    // Use a branch name that doesn't exist yet - NO worktree is pre-created
+    // Use a branch name that doesn't exist yet
+    // Note: Worktrees are now created at execution time, not when adding to backlog
     const branchName = "feature/auto-create-worktree";
-    const expectedWorktreePath = getWorktreePath(testRepo.path, branchName);
 
-    // Verify worktree does NOT exist before we create the feature
-    expect(fs.existsSync(expectedWorktreePath)).toBe(false);
+    // Verify branch does NOT exist before we create the feature
+    const branchesBefore = await listBranches(testRepo.path);
+    expect(branchesBefore).not.toContain(branchName);
 
     // Click add feature button
     await clickAddFeature(page);
@@ -802,17 +807,14 @@ test.describe("Worktree Integration Tests", () => {
     // Confirm
     await confirmAddFeature(page);
 
-    // Wait for the worktree to be created
-    await page.waitForTimeout(2000);
+    // Wait for feature to be saved
+    await page.waitForTimeout(1000);
 
-    // Verify worktree was automatically created when feature was added
-    expect(fs.existsSync(expectedWorktreePath)).toBe(true);
+    // Verify branch was NOT created when adding feature (created at execution time)
+    const branchesAfter = await listBranches(testRepo.path);
+    expect(branchesAfter).not.toContain(branchName);
 
-    // Verify the branch was created
-    const branches = await listBranches(testRepo.path);
-    expect(branches).toContain(branchName);
-
-    // Verify feature was created with correct branch
+    // Verify feature was created with correct branch name stored
     const featuresDir = path.join(testRepo.path, ".automaker", "features");
     const featureDirs = fs.readdirSync(featuresDir);
     expect(featureDirs.length).toBeGreaterThan(0);
@@ -829,8 +831,15 @@ test.describe("Worktree Integration Tests", () => {
 
     const featureFilePath = path.join(featuresDir, featureDir!, "feature.json");
     const featureData = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
+    
+    // Verify branch name is stored
     expect(featureData.branchName).toBe(branchName);
-    expect(featureData.worktreePath).toBe(expectedWorktreePath);
+    
+    // Verify worktreePath is NOT set (worktrees are created at execution time)
+    expect(featureData.worktreePath).toBeUndefined();
+    
+    // Verify feature is in backlog status
+    expect(featureData.status).toBe("backlog");
   });
 
   test("should reset feature branch and worktree when worktree is deleted", async ({
@@ -887,8 +896,11 @@ test.describe("Worktree Integration Tests", () => {
 
     let featureFilePath = path.join(featuresDir, featureDir!, "feature.json");
     let featureData = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
+    
+    // Verify feature was created with the branch name stored
     expect(featureData.branchName).toBe(branchName);
-    expect(featureData.worktreePath).toBe(worktreePath);
+    // Verify worktreePath is NOT set (worktrees are created at execution time, not when adding)
+    expect(featureData.worktreePath).toBeUndefined();
 
     // Delete the worktree via UI
     // Open the worktree actions menu
@@ -911,10 +923,11 @@ test.describe("Worktree Integration Tests", () => {
     // Verify worktree is deleted
     expect(fs.existsSync(worktreePath)).toBe(false);
 
-    // Verify feature's branchName and worktreePath are reset to null
+    // Verify feature's branchName is reset to null/undefined when worktree is deleted
+    // (worktreePath was never stored, so it remains undefined)
     featureData = JSON.parse(fs.readFileSync(featureFilePath, "utf-8"));
     expect(featureData.branchName).toBeNull();
-    expect(featureData.worktreePath).toBeNull();
+    expect(featureData.worktreePath).toBeUndefined();
 
     // Verify the feature appears in the backlog when main is selected
     const mainButton = page.getByRole("button", { name: "main" }).first();
@@ -940,8 +953,9 @@ test.describe("Worktree Integration Tests", () => {
     await otherWorktreeButton.click();
     await page.waitForTimeout(500);
 
-    // Unassigned features should still be visible in the backlog
-    await expect(featureText).toBeVisible({ timeout: 5000 });
+    // Unassigned features should NOT be visible on non-primary worktrees
+    // They should only show on the primary (main) worktree
+    await expect(featureText).not.toBeVisible({ timeout: 5000 });
   });
 
   test("should filter features by selected worktree", async ({ page }) => {
@@ -1062,9 +1076,11 @@ test.describe("Worktree Integration Tests", () => {
     // Open add feature dialog
     await clickAddFeature(page);
 
-    // Verify the branch input button shows the selected worktree's branch
-    const branchButton = page.locator('[data-testid="feature-branch-input"]');
-    await expect(branchButton).toContainText(branchName, { timeout: 5000 });
+    // Verify the branch selector shows the selected worktree's branch
+    // When a worktree is selected, "Use current selected branch" should be selected
+    // and the branch name should be shown in the label
+    const currentBranchLabel = page.locator('label[for="feature-current"]');
+    await expect(currentBranchLabel).toContainText(branchName, { timeout: 5000 });
 
     // Close dialog
     await page.keyboard.press("Escape");

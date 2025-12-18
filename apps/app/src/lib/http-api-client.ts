@@ -738,7 +738,6 @@ export class HttpApiClient implements ElectronAPI {
         isAutoMode: boolean;
       }>;
       totalCount?: number;
-      autoLoopRunning?: boolean;
       error?: string;
     }> => this.get("/api/running-agents"),
   };

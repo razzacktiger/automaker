@@ -19,12 +19,10 @@ export function createResumeFeatureHandler(autoModeService: AutoModeService) {
       };
 
       if (!projectPath || !featureId) {
-        res
-          .status(400)
-          .json({
-            success: false,
-            error: "projectPath and featureId are required",
-          });
+        res.status(400).json({
+          success: false,
+          error: "projectPath and featureId are required",
+        });
         return;
       }
 
@@ -34,7 +32,8 @@ export function createResumeFeatureHandler(autoModeService: AutoModeService) {
         .resumeFeature(projectPath, featureId, useWorktrees ?? false)
         .catch((error) => {
           logger.error(`[AutoMode] Resume feature ${featureId} error:`, error);
-        });
+        })
+        .finally(() => {});
 
       res.json({ success: true });
     } catch (error) {

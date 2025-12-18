@@ -53,14 +53,18 @@ export function CreatePRDialog({
   // Reset state when dialog opens or worktree changes
   useEffect(() => {
     if (open) {
-      // Only reset form fields, not the result states (prUrl, browserUrl, showBrowserFallback)
-      // These are set by the API response and should persist until dialog closes
+      // Reset form fields
       setTitle("");
       setBody("");
       setCommitMessage("");
       setBaseBranch("main");
       setIsDraft(false);
       setError(null);
+      // Also reset result states when opening for a new worktree
+      // This prevents showing stale PR URLs from previous worktrees
+      setPrUrl(null);
+      setBrowserUrl(null);
+      setShowBrowserFallback(false);
     } else {
       // Reset everything when dialog closes
       setTitle("");
@@ -105,7 +109,8 @@ export function CreatePRDialog({
               onClick: () => window.open(result.result!.prUrl!, "_blank"),
             },
           });
-          onCreated();
+          // Don't call onCreated() here - keep dialog open to show success message
+          // onCreated() will be called when user closes the dialog
         } else {
           // Branch was pushed successfully
           const prError = result.result.prError;
@@ -182,6 +187,9 @@ export function CreatePRDialog({
   };
 
   const handleClose = () => {
+    // Call onCreated() to refresh worktrees when dialog closes
+    // This ensures the worktree list is updated after any operation
+    onCreated();
     onOpenChange(false);
     // Reset state after dialog closes
     setTimeout(() => {
@@ -228,13 +236,18 @@ export function CreatePRDialog({
                 Your PR is ready for review
               </p>
             </div>
-            <Button
-              onClick={() => window.open(prUrl, "_blank")}
-              className="gap-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              View Pull Request
-            </Button>
+            <div className="flex gap-2 justify-center">
+              <Button
+                onClick={() => window.open(prUrl, "_blank")}
+                className="gap-2"
+              >
+                <ExternalLink className="w-4 h-4" />
+                View Pull Request
+              </Button>
+              <Button variant="outline" onClick={handleClose}>
+                Close
+              </Button>
+            </div>
           </div>
         ) : shouldShowBrowserFallback ? (
           <div className="py-6 text-center space-y-4">

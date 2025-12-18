@@ -44,6 +44,7 @@ import {
   ProfileQuickSelect,
   TestingTabContent,
   PrioritySelector,
+  BranchSelector,
 } from "../shared";
 import {
   DropdownMenu,
@@ -66,12 +67,13 @@ interface EditFeatureDialogProps {
       model: AgentModel;
       thinkingLevel: ThinkingLevel;
       imagePaths: DescriptionImagePath[];
-      branchName: string;
+      branchName: string; // Can be empty string to use current branch
       priority: number;
     }
   ) => void;
   categorySuggestions: string[];
   branchSuggestions: string[];
+  currentBranch?: string;
   isMaximized: boolean;
   showProfilesOnly: boolean;
   aiProfiles: AIProfile[];
@@ -84,12 +86,17 @@ export function EditFeatureDialog({
   onUpdate,
   categorySuggestions,
   branchSuggestions,
+  currentBranch,
   isMaximized,
   showProfilesOnly,
   aiProfiles,
   allFeatures,
 }: EditFeatureDialogProps) {
   const [editingFeature, setEditingFeature] = useState<Feature | null>(feature);
+  const [useCurrentBranch, setUseCurrentBranch] = useState(() => {
+    // If feature has no branchName, default to using current branch
+    return !feature?.branchName;
+  });
   const [editFeaturePreviewMap, setEditFeaturePreviewMap] =
     useState<ImagePreviewMap>(() => new Map());
   const [showEditAdvancedOptions, setShowEditAdvancedOptions] = useState(false);
@@ -107,11 +114,26 @@ export function EditFeatureDialog({
     if (!feature) {
       setEditFeaturePreviewMap(new Map());
       setShowEditAdvancedOptions(false);
+    } else {
+      // If feature has no branchName, default to using current branch
+      setUseCurrentBranch(!feature.branchName);
     }
   }, [feature]);
 
   const handleUpdate = () => {
     if (!editingFeature) return;
+
+    // Validate branch selection when "other branch" is selected and branch selector is enabled
+    const isBranchSelectorEnabled = editingFeature.status === "backlog";
+    if (
+      useWorktrees &&
+      isBranchSelectorEnabled &&
+      !useCurrentBranch &&
+      !editingFeature.branchName?.trim()
+    ) {
+      toast.error("Please select a branch name");
+      return;
+    }
 
     const selectedModel = (editingFeature.model ?? "opus") as AgentModel;
     const normalizedThinking: ThinkingLevel = modelSupportsThinking(
@@ -119,6 +141,12 @@ export function EditFeatureDialog({
     )
       ? editingFeature.thinkingLevel ?? "none"
       : "none";
+
+    // Use current branch if toggle is on (empty string = use current), otherwise use selected branch
+    // Important: Don't save the actual current branch name - empty string means "use current"
+    const finalBranchName = useCurrentBranch
+      ? ""
+      : editingFeature.branchName || "";
 
     const updates = {
       category: editingFeature.category,
@@ -128,7 +156,7 @@ export function EditFeatureDialog({
       model: selectedModel,
       thinkingLevel: normalizedThinking,
       imagePaths: editingFeature.imagePaths ?? [],
-      branchName: editingFeature.branchName ?? "main",
+      branchName: finalBranchName,
       priority: editingFeature.priority ?? 2,
     };
 
@@ -339,33 +367,21 @@ export function EditFeatureDialog({
               />
             </div>
             {useWorktrees && (
-              <div className="space-y-2">
-                <Label htmlFor="edit-branch">Target Branch</Label>
-                <BranchAutocomplete
-                  value={editingFeature.branchName ?? "main"}
-                  onChange={(value) =>
-                    setEditingFeature({
-                      ...editingFeature,
-                      branchName: value,
-                    })
-                  }
-                  branches={branchSuggestions}
-                  placeholder="Select or create branch..."
-                  data-testid="edit-feature-branch"
-                  disabled={editingFeature.status !== "backlog"}
-                />
-                {editingFeature.status !== "backlog" && (
-                  <p className="text-xs text-muted-foreground">
-                    Branch cannot be changed after work has started.
-                  </p>
-                )}
-                {editingFeature.status === "backlog" && (
-                  <p className="text-xs text-muted-foreground">
-                    Work will be done in this branch. A worktree will be created
-                    if needed.
-                  </p>
-                )}
-              </div>
+              <BranchSelector
+                useCurrentBranch={useCurrentBranch}
+                onUseCurrentBranchChange={setUseCurrentBranch}
+                branchName={editingFeature.branchName ?? ""}
+                onBranchNameChange={(value) =>
+                  setEditingFeature({
+                    ...editingFeature,
+                    branchName: value,
+                  })
+                }
+                branchSuggestions={branchSuggestions}
+                currentBranch={currentBranch}
+                disabled={editingFeature.status !== "backlog"}
+                testIdPrefix="edit-feature"
+              />
             )}
 
             {/* Priority Selector */}
@@ -486,6 +502,12 @@ export function EditFeatureDialog({
               hotkey={{ key: "Enter", cmdCtrl: true }}
               hotkeyActive={!!editingFeature}
               data-testid="confirm-edit-feature"
+              disabled={
+                useWorktrees &&
+                editingFeature.status === "backlog" &&
+                !useCurrentBranch &&
+                !editingFeature.branchName?.trim()
+              }
             >
               Save Changes
             </HotkeyButton>

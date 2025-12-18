@@ -14,7 +14,7 @@ import { HotkeyButton } from "@/components/ui/hotkey-button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { KanbanColumn, KanbanCard } from "./components";
 import { Feature } from "@/store/app-store";
-import { FastForward, Lightbulb, Trash2 } from "lucide-react";
+import { FastForward, Lightbulb, Archive } from "lucide-react";
 import { useKeyboardShortcutsConfig } from "@/hooks/use-keyboard-shortcuts";
 import { COLUMNS, ColumnId } from "./constants";
 
@@ -53,7 +53,7 @@ interface KanbanBoardProps {
   onStartNextFeatures: () => void;
   onShowSuggestions: () => void;
   suggestionsCount: number;
-  onDeleteAllVerified: () => void;
+  onArchiveAllVerified: () => void;
 }
 
 export function KanbanBoard({
@@ -83,7 +83,7 @@ export function KanbanBoard({
   onStartNextFeatures,
   onShowSuggestions,
   suggestionsCount,
-  onDeleteAllVerified,
+  onArchiveAllVerified,
 }: KanbanBoardProps) {
   return (
     <div
@@ -115,12 +115,12 @@ export function KanbanBoard({
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 px-2 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={onDeleteAllVerified}
-                      data-testid="delete-all-verified-button"
+                      className="h-6 px-2 text-xs"
+                      onClick={onArchiveAllVerified}
+                      data-testid="archive-all-verified-button"
                     >
-                      <Trash2 className="w-3 h-3 mr-1" />
-                      Delete All
+                      <Archive className="w-3 h-3 mr-1" />
+                      Archive All
                     </Button>
                   ) : column.id === "backlog" ? (
                     <div className="flex items-center gap-1">

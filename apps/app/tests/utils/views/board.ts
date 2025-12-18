@@ -137,8 +137,17 @@ export async function fillAddFeatureDialog(
 
   // Fill branch if provided (it's a combobox autocomplete)
   if (options?.branch) {
-    const branchButton = page.locator('[data-testid="feature-branch-input"]');
-    await branchButton.click();
+    // First, select "Other branch" radio option if not already selected
+    const otherBranchRadio = page.locator('[data-testid="feature-radio-group"]').locator('[id="feature-other"]');
+    await otherBranchRadio.waitFor({ state: "visible", timeout: 5000 });
+    await otherBranchRadio.click();
+    // Wait for the branch input to appear
+    await page.waitForTimeout(300);
+    
+    // Now click on the branch input (autocomplete)
+    const branchInput = page.locator('[data-testid="feature-input"]');
+    await branchInput.waitFor({ state: "visible", timeout: 5000 });
+    await branchInput.click();
     // Wait for the popover to open
     await page.waitForTimeout(300);
     // Type in the command input

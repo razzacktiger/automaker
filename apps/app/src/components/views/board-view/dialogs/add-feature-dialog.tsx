@@ -43,6 +43,7 @@ import {
   ProfileQuickSelect,
   TestingTabContent,
   PrioritySelector,
+  BranchSelector,
 } from "../shared";
 import {
   DropdownMenu,
@@ -63,13 +64,14 @@ interface AddFeatureDialogProps {
     skipTests: boolean;
     model: AgentModel;
     thinkingLevel: ThinkingLevel;
-    branchName: string;
+    branchName: string; // Can be empty string to use current branch
     priority: number;
   }) => void;
   categorySuggestions: string[];
   branchSuggestions: string[];
   defaultSkipTests: boolean;
   defaultBranch?: string;
+  currentBranch?: string;
   isMaximized: boolean;
   showProfilesOnly: boolean;
   aiProfiles: AIProfile[];
@@ -83,10 +85,12 @@ export function AddFeatureDialog({
   branchSuggestions,
   defaultSkipTests,
   defaultBranch = "main",
+  currentBranch,
   isMaximized,
   showProfilesOnly,
   aiProfiles,
 }: AddFeatureDialogProps) {
+  const [useCurrentBranch, setUseCurrentBranch] = useState(true);
   const [newFeature, setNewFeature] = useState({
     category: "",
     description: "",
@@ -96,7 +100,7 @@ export function AddFeatureDialog({
     skipTests: false,
     model: "opus" as AgentModel,
     thinkingLevel: "none" as ThinkingLevel,
-    branchName: "main",
+    branchName: "",
     priority: 2 as number, // Default to medium priority
   });
   const [newFeaturePreviewMap, setNewFeaturePreviewMap] =
@@ -117,8 +121,9 @@ export function AddFeatureDialog({
       setNewFeature((prev) => ({
         ...prev,
         skipTests: defaultSkipTests,
-        branchName: defaultBranch,
+        branchName: defaultBranch || "",
       }));
+      setUseCurrentBranch(true);
     }
   }, [open, defaultSkipTests, defaultBranch]);
 
@@ -128,11 +133,23 @@ export function AddFeatureDialog({
       return;
     }
 
+    // Validate branch selection when "other branch" is selected
+    if (useWorktrees && !useCurrentBranch && !newFeature.branchName.trim()) {
+      toast.error("Please select a branch name");
+      return;
+    }
+
     const category = newFeature.category || "Uncategorized";
     const selectedModel = newFeature.model;
     const normalizedThinking = modelSupportsThinking(selectedModel)
       ? newFeature.thinkingLevel
       : "none";
+
+    // Use current branch if toggle is on (empty string = use current), otherwise use selected branch
+    // Important: Don't save the actual current branch name - empty string means "use current"
+    const finalBranchName = useCurrentBranch
+      ? ""
+      : newFeature.branchName || "";
 
     onAdd({
       category,
@@ -143,7 +160,7 @@ export function AddFeatureDialog({
       skipTests: newFeature.skipTests,
       model: selectedModel,
       thinkingLevel: normalizedThinking,
-      branchName: newFeature.branchName,
+      branchName: finalBranchName,
       priority: newFeature.priority,
     });
 
@@ -158,8 +175,9 @@ export function AddFeatureDialog({
       model: "opus",
       priority: 2,
       thinkingLevel: "none",
-      branchName: defaultBranch,
+      branchName: "",
     });
+    setUseCurrentBranch(true);
     setNewFeaturePreviewMap(new Map());
     setShowAdvancedOptions(false);
     setDescriptionError(false);
@@ -359,22 +377,17 @@ export function AddFeatureDialog({
               />
             </div>
             {useWorktrees && (
-              <div className="space-y-2">
-                <Label htmlFor="branch">Target Branch</Label>
-                <BranchAutocomplete
-                  value={newFeature.branchName}
-                  onChange={(value) =>
-                    setNewFeature({ ...newFeature, branchName: value })
-                  }
-                  branches={branchSuggestions}
-                  placeholder="Select or create branch..."
-                  data-testid="feature-branch-input"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Work will be done in this branch. A worktree will be created if
-                  needed.
-                </p>
-              </div>
+              <BranchSelector
+                useCurrentBranch={useCurrentBranch}
+                onUseCurrentBranchChange={setUseCurrentBranch}
+                branchName={newFeature.branchName}
+                onBranchNameChange={(value) =>
+                  setNewFeature({ ...newFeature, branchName: value })
+                }
+                branchSuggestions={branchSuggestions}
+                currentBranch={currentBranch}
+                testIdPrefix="feature"
+              />
             )}
 
             {/* Priority Selector */}
@@ -477,6 +490,11 @@ export function AddFeatureDialog({
             hotkey={{ key: "Enter", cmdCtrl: true }}
             hotkeyActive={open}
             data-testid="confirm-add-feature"
+            disabled={
+              useWorktrees &&
+              !useCurrentBranch &&
+              !newFeature.branchName.trim()
+            }
           >
             Add Feature
           </HotkeyButton>
