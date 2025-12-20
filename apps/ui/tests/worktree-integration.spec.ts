@@ -2716,10 +2716,11 @@ test.describe("Worktree Integration Tests", () => {
     const editDialog = page.locator('[data-testid="edit-feature-dialog"]');
     await expect(editDialog).toBeVisible({ timeout: 5000 });
 
-    // Update the description
+    // Update the description - wait for the textarea to be visible
     const descInput = page.locator(
-      '[data-testid="edit-feature-description"] textarea'
+      '[data-testid="feature-description-input"]'
     );
+    await expect(descInput).toBeVisible({ timeout: 5000 });
     await descInput.fill("Feature with PR URL persistence - updated");
 
     // Save the feature
