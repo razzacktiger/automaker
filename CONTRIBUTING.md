@@ -72,6 +72,7 @@ Before contributing to Automaker, ensure you have the following installed on you
   - Required to run the AI development features
 
 **Optional but recommended:**
+
 - A code editor with TypeScript support (VS Code recommended)
 - GitHub CLI (`gh`) for easier PR management
 
@@ -83,12 +84,14 @@ Before contributing to Automaker, ensure you have the following installed on you
    - This creates your own copy of the repository
 
 2. **Clone your fork locally**
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/automaker.git
    cd automaker
    ```
 
 3. **Add the upstream remote** to keep your fork in sync
+
    ```bash
    git remote add upstream https://github.com/AutoMaker-Org/automaker.git
    ```
@@ -106,11 +109,13 @@ Before contributing to Automaker, ensure you have the following installed on you
 ### Development Setup
 
 1. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 2. **Build shared packages** (required before running the app)
+
    ```bash
    npm run build:packages
    ```
@@ -124,20 +129,20 @@ Before contributing to Automaker, ensure you have the following installed on you
 
 **Common development commands:**
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Interactive development launcher |
-| `npm run dev:web` | Start in browser mode |
-| `npm run dev:electron` | Start desktop app |
-| `npm run build` | Build all packages and apps |
-| `npm run build:packages` | Build shared packages only |
-| `npm run lint` | Run ESLint checks |
-| `npm run format` | Format code with Prettier |
-| `npm run format:check` | Check formatting without changes |
-| `npm run test` | Run E2E tests (Playwright) |
-| `npm run test:server` | Run server unit tests |
-| `npm run test:packages` | Run package tests |
-| `npm run test:all` | Run all tests |
+| Command                  | Description                      |
+| ------------------------ | -------------------------------- |
+| `npm run dev`            | Interactive development launcher |
+| `npm run dev:web`        | Start in browser mode            |
+| `npm run dev:electron`   | Start desktop app                |
+| `npm run build`          | Build all packages and apps      |
+| `npm run build:packages` | Build shared packages only       |
+| `npm run lint`           | Run ESLint checks                |
+| `npm run format`         | Format code with Prettier        |
+| `npm run format:check`   | Check formatting without changes |
+| `npm run test`           | Run E2E tests (Playwright)       |
+| `npm run test:server`    | Run server unit tests            |
+| `npm run test:packages`  | Run package tests                |
+| `npm run test:all`       | Run all tests                    |
 
 ### Project Structure
 
@@ -157,11 +162,11 @@ automaker/
 │   ├── @automaker/dependency-resolver/ # Dependency management
 │   └── @automaker/git-utils/        # Git operations
 ├── docs/                # Documentation
-├── e2e/                 # End-to-end tests
 └── package.json         # Root package configuration
 ```
 
 **Key conventions:**
+
 - Always import from `@automaker/*` shared packages, never use relative paths to `libs/`
 - Frontend code lives in `apps/ui/`
 - Backend code lives in `apps/server/`
@@ -183,16 +188,17 @@ We use a consistent branch naming pattern to keep our repository organized:
 
 **Branch types:**
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| `feature` | New functionality | `feature/add-user-authentication` |
-| `fix` | Bug fixes | `fix/resolve-memory-leak` |
-| `docs` | Documentation changes | `docs/update-contributing-guide` |
-| `refactor` | Code restructuring | `refactor/simplify-api-handlers` |
-| `test` | Adding or updating tests | `test/add-utils-unit-tests` |
-| `chore` | Maintenance tasks | `chore/update-dependencies` |
+| Type       | Purpose                  | Example                           |
+| ---------- | ------------------------ | --------------------------------- |
+| `feature`  | New functionality        | `feature/add-user-authentication` |
+| `fix`      | Bug fixes                | `fix/resolve-memory-leak`         |
+| `docs`     | Documentation changes    | `docs/update-contributing-guide`  |
+| `refactor` | Code restructuring       | `refactor/simplify-api-handlers`  |
+| `test`     | Adding or updating tests | `test/add-utils-unit-tests`       |
+| `chore`    | Maintenance tasks        | `chore/update-dependencies`       |
 
 **Guidelines:**
+
 - Use lowercase letters and hyphens (no underscores or spaces)
 - Keep descriptions short but descriptive
 - Include issue number when applicable: `feature/123-add-login`
@@ -217,17 +223,18 @@ We follow the **Conventional Commits** style for clear, readable commit history:
 
 **Commit types:**
 
-| Type | Purpose |
-|------|---------|
-| `feat` | New feature |
-| `fix` | Bug fix |
-| `docs` | Documentation only |
-| `style` | Formatting (no code change) |
-| `refactor` | Code restructuring |
-| `test` | Adding or updating tests |
-| `chore` | Maintenance tasks |
+| Type       | Purpose                     |
+| ---------- | --------------------------- |
+| `feat`     | New feature                 |
+| `fix`      | Bug fix                     |
+| `docs`     | Documentation only          |
+| `style`    | Formatting (no code change) |
+| `refactor` | Code restructuring          |
+| `test`     | Adding or updating tests    |
+| `chore`    | Maintenance tasks           |
 
 **Guidelines:**
+
 - Use **imperative mood** ("Add feature" not "Added feature")
 - Keep first line under **72 characters**
 - Capitalize the first letter after the type prefix
@@ -347,7 +354,7 @@ All contributions go through code review to maintain quality:
 #### What to Expect
 
 1. **CI Checks Run First** - Automated checks (format, lint, build, tests) must pass before review
-2. **Maintainer Review** - The project maintainer ([webdevcody](https://github.com/webdevcody)) will review your PR and decide whether to merge it
+2. **Maintainer Review** - The project maintainers will review your PR and decide whether to merge it
 3. **Feedback & Discussion** - The reviewer may ask questions or request changes
 4. **Iteration** - Make requested changes and push updates to the same branch
 5. **Approval & Merge** - Once approved and checks pass, your PR will be merged
@@ -383,7 +390,7 @@ Your PR is ready to merge when:
 If your PR seems stuck:
 
 - Comment asking for status update (mention @webdevcody if needed)
-- Reach out on [Discord](https://discord.gg/JUDWZDN3VT)
+- Reach out on [Discord](https://discord.gg/jjem7aEDKU)
 - Make sure all checks are passing and you've responded to all feedback
 
 ---
@@ -402,12 +409,12 @@ Testing helps prevent regressions. Automaker uses **Playwright** for end-to-end 
 
 Use these commands to run tests locally:
 
-| Command | Description |
-|---------|-------------|
-| `npm run test` | Run E2E tests (Playwright) |
-| `npm run test:server` | Run server unit tests (Vitest) |
-| `npm run test:packages` | Run shared package tests |
-| `npm run test:all` | Run all tests |
+| Command                        | Description                           |
+| ------------------------------ | ------------------------------------- |
+| `npm run test`                 | Run E2E tests (Playwright)            |
+| `npm run test:server`          | Run server unit tests (Vitest)        |
+| `npm run test:packages`        | Run shared package tests              |
+| `npm run test:all`             | Run all tests                         |
 | `npm run test:server:coverage` | Run server tests with coverage report |
 
 **Before submitting a PR**, always run the full test suite:
@@ -436,7 +443,7 @@ npm run test
 npx playwright test --headed
 
 # Run a specific test file
-npx playwright test e2e/example.spec.ts
+npm test --workspace=@automaker/ui -- tests/example.spec.ts
 ```
 
 **E2E Test Guidelines:**
@@ -452,7 +459,7 @@ npx playwright test e2e/example.spec.ts
 Unit tests verify individual functions and modules work correctly in isolation.
 
 - **Framework:** [Vitest](https://vitest.dev/)
-- **Location:** Alongside source files or in `__tests__` directories
+- **Location:** In the `tests/` directory within each package (e.g., `apps/server/tests/`)
 
 **Running unit tests:**
 
@@ -487,7 +494,6 @@ npx vitest --watch
 - **Refactoring:** Ensure existing tests pass after refactoring
 - **Public APIs:** All public APIs must have test coverage
 
-
 ### CI/CD Pipeline
 
 Automaker uses **GitHub Actions** for continuous integration. Every pull request triggers automated checks.
@@ -496,12 +502,12 @@ Automaker uses **GitHub Actions** for continuous integration. Every pull request
 
 The following checks must pass before your PR can be merged:
 
-| Check | Description |
-|-------|-------------|
-| **Format** | Verifies code is formatted with Prettier |
-| **Build** | Ensures the project compiles without errors |
+| Check             | Description                                   |
+| ----------------- | --------------------------------------------- |
+| **Format**        | Verifies code is formatted with Prettier      |
+| **Build**         | Ensures the project compiles without errors   |
 | **Package Tests** | Runs tests for shared `@automaker/*` packages |
-| **Server Tests** | Runs server unit tests with coverage |
+| **Server Tests**  | Runs server unit tests with coverage          |
 
 #### CI Testing Environment
 
@@ -523,12 +529,12 @@ This allows tests to run without requiring a real Claude API connection.
 
 #### Common CI Failures
 
-| Issue | Solution |
-|-------|----------|
-| Format check failed | Run `npm run format` locally |
-| Build failed | Run `npm run build` and fix TypeScript errors |
-| Tests failed | Run `npm run test:all` locally to reproduce |
-| Coverage decreased | Add tests for new code paths |
+| Issue               | Solution                                      |
+| ------------------- | --------------------------------------------- |
+| Format check failed | Run `npm run format` locally                  |
+| Build failed        | Run `npm run build` and fix TypeScript errors |
+| Tests failed        | Run `npm run test:all` locally to reproduce   |
+| Coverage decreased  | Add tests for new code paths                  |
 
 ### Coverage Requirements
 
@@ -582,23 +588,28 @@ When creating a bug report, include:
 ## Bug: WebSocket connection drops after 5 minutes of inactivity
 
 ### Environment
+
 - OS: Windows 11
 - Node.js: 22.11.0
 - Automaker: commit abc1234
 
 ### Steps to Reproduce
+
 1. Start the application with `npm run dev:web`
 2. Open the Kanban board
 3. Leave the browser tab open for 5+ minutes without interaction
 4. Try to move a card
 
 ### Expected Behavior
+
 The card should move to the new column.
 
 ### Actual Behavior
+
 The UI shows "Connection lost" and the card doesn't move.
 
 ### Logs
+
 [WebSocket] Connection closed: 1006
 ```
 
@@ -627,18 +638,22 @@ A good feature request includes:
 ## Feature: Dark Mode Support
 
 ### Problem Statement
+
 Working late at night, the bright UI causes eye strain and doesn't match
 my system's dark theme preference.
 
 ### Proposed Solution
+
 Add a theme toggle in the settings panel that allows switching between
 light and dark modes. Ideally, it should also detect system preference.
 
 ### Alternatives Considered
+
 - Browser extension to force dark mode (doesn't work well with custom styling)
 - Custom CSS override (breaks with updates)
 
 ### Additional Context
+
 Similar to how VS Code handles themes - a dropdown in settings with
 immediate preview.
 ```
