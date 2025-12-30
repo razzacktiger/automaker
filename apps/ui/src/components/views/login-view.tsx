@@ -67,6 +67,7 @@ export function LoginView() {
               disabled={isLoading}
               autoFocus
               className="font-mono"
+              data-testid="login-api-key-input"
             />
           </div>
 
@@ -77,7 +78,12 @@ export function LoginView() {
             </div>
           )}
 
-          <Button type="submit" className="w-full" disabled={isLoading || !apiKey.trim()}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading || !apiKey.trim()}
+            data-testid="login-submit-button"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

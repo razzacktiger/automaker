@@ -278,15 +278,74 @@ export async function apiListBranches(
 /**
  * Authenticate with the server using an API key
  * This sets a session cookie that will be used for subsequent requests
+ * Uses browser context to ensure cookies are properly set
  */
 export async function authenticateWithApiKey(page: Page, apiKey: string): Promise<boolean> {
   try {
-    const response = await page.request.post(`${API_BASE_URL}/api/auth/login`, {
-      data: { apiKey },
-    });
-    const data = await response.json();
-    return data.success === true;
-  } catch {
+    // Ensure we're on a page (needed for cookies to work)
+    const currentUrl = page.url();
+    if (!currentUrl || currentUrl === 'about:blank') {
+      await page.goto('http://localhost:3007', { waitUntil: 'domcontentloaded' });
+    }
+
+    // Use browser context fetch to ensure cookies are set in the browser
+    const response = await page.evaluate(
+      async ({ url, apiKey }) => {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ apiKey }),
+        });
+        const data = await res.json();
+        return { success: data.success, token: data.token };
+      },
+      { url: `${API_BASE_URL}/api/auth/login`, apiKey }
+    );
+
+    if (response.success && response.token) {
+      // Manually set the cookie in the browser context
+      // The server sets a cookie named 'automaker_session' (see SESSION_COOKIE_NAME in auth.ts)
+      await page.context().addCookies([
+        {
+          name: 'automaker_session',
+          value: response.token,
+          domain: 'localhost',
+          path: '/',
+          httpOnly: true,
+          sameSite: 'Lax',
+        },
+      ]);
+
+      // Verify the session is working by polling auth status
+      // This replaces arbitrary timeout with actual condition check
+      let attempts = 0;
+      const maxAttempts = 10;
+      while (attempts < maxAttempts) {
+        const statusResponse = await page.evaluate(
+          async ({ url }) => {
+            const res = await fetch(url, {
+              credentials: 'include',
+            });
+            return res.json();
+          },
+          { url: `${API_BASE_URL}/api/auth/status` }
+        );
+
+        if (statusResponse.authenticated === true) {
+          return true;
+        }
+        attempts++;
+        // Use a very short wait between polling attempts (this is acceptable for polling)
+        await page.waitForFunction(() => true, { timeout: 50 });
+      }
+
+      return false;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Authentication error:', error);
     return false;
   }
 }

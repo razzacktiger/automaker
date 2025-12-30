@@ -119,9 +119,6 @@ test.describe('Add Context Image', () => {
   test('should import an image file to context', async ({ page }) => {
     await setupProjectWithFixture(page, getFixturePath());
 
-    // Authenticate with the server before navigating
-    await authenticateForTests(page);
-
     await page.goto('/');
     await waitForNetworkIdle(page);
 

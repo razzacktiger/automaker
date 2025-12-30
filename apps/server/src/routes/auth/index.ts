@@ -28,6 +28,9 @@ import {
 const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
 const RATE_LIMIT_MAX_ATTEMPTS = 5; // Max 5 attempts per window
 
+// Check if we're in test mode - disable rate limiting for E2E tests
+const isTestMode = process.env.AUTOMAKER_MOCK_AGENT === 'true';
+
 // In-memory rate limit tracking (resets on server restart)
 const loginAttempts = new Map<string, { count: number; windowStart: number }>();
 
@@ -135,15 +138,18 @@ export function createAuthRoutes(): Router {
   router.post('/login', async (req, res) => {
     const clientIp = getClientIp(req);
 
-    // Check rate limit before processing
-    const rateLimit = checkRateLimit(clientIp);
-    if (rateLimit.limited) {
-      res.status(429).json({
-        success: false,
-        error: 'Too many login attempts. Please try again later.',
-        retryAfter: rateLimit.retryAfter,
-      });
-      return;
+    // Skip rate limiting in test mode to allow parallel E2E tests
+    if (!isTestMode) {
+      // Check rate limit before processing
+      const rateLimit = checkRateLimit(clientIp);
+      if (rateLimit.limited) {
+        res.status(429).json({
+          success: false,
+          error: 'Too many login attempts. Please try again later.',
+          retryAfter: rateLimit.retryAfter,
+        });
+        return;
+      }
     }
 
     const { apiKey } = req.body as { apiKey?: string };
@@ -156,8 +162,10 @@ export function createAuthRoutes(): Router {
       return;
     }
 
-    // Record this attempt (only for actual API key validation attempts)
-    recordLoginAttempt(clientIp);
+    // Record this attempt (only for actual API key validation attempts, skip in test mode)
+    if (!isTestMode) {
+      recordLoginAttempt(clientIp);
+    }
 
     if (!validateApiKey(apiKey)) {
       res.status(401).json({
