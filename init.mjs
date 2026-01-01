@@ -368,14 +368,14 @@ async function main() {
 
   // Check for processes on required ports and prompt user
   log('Checking for processes on ports 3007 and 3008...', 'yellow');
-  
+
   const webPortInUse = isPortInUse(3007);
   const serverPortInUse = isPortInUse(3008);
-  
+
   let webPort = 3007;
   let serverPort = 3008;
   let corsOriginEnv = process.env.CORS_ORIGIN || '';
-  
+
   if (webPortInUse || serverPortInUse) {
     console.log('');
     if (webPortInUse) {
@@ -387,11 +387,13 @@ async function main() {
       log(`⚠ Port 3008 is in use by process(es): ${pids.join(', ')}`, 'yellow');
     }
     console.log('');
-    
+
     while (true) {
-      const choice = await prompt('What would you like to do? (k)ill processes, (u)se different ports, or (c)ancel: ');
+      const choice = await prompt(
+        'What would you like to do? (k)ill processes, (u)se different ports, or (c)ancel: '
+      );
       const lowerChoice = choice.toLowerCase();
-      
+
       if (lowerChoice === 'k' || lowerChoice === 'kill') {
         if (webPortInUse) {
           await killPort(3007);
@@ -409,59 +411,68 @@ async function main() {
         while (true) {
           const newWebPort = await prompt('Enter web port (default 3007): ');
           const parsedWebPort = newWebPort.trim() ? parseInt(newWebPort.trim(), 10) : 3007;
-          
+
           if (isNaN(parsedWebPort) || parsedWebPort < 1024 || parsedWebPort > 65535) {
             log('Invalid port. Please enter a number between 1024 and 65535.', 'red');
             continue;
           }
-          
+
           if (isPortInUse(parsedWebPort)) {
             const pids = getProcessesOnPort(parsedWebPort);
-            log(`Port ${parsedWebPort} is already in use by process(es): ${pids.join(', ')}`, 'red');
+            log(
+              `Port ${parsedWebPort} is already in use by process(es): ${pids.join(', ')}`,
+              'red'
+            );
             const useAnyway = await prompt('Use this port anyway? (y/n): ');
             if (useAnyway.toLowerCase() !== 'y' && useAnyway.toLowerCase() !== 'yes') {
               continue;
             }
           }
-          
+
           webPort = parsedWebPort;
           break;
         }
-        
+
         while (true) {
           const newServerPort = await prompt('Enter server port (default 3008): ');
           const parsedServerPort = newServerPort.trim() ? parseInt(newServerPort.trim(), 10) : 3008;
-          
+
           if (isNaN(parsedServerPort) || parsedServerPort < 1024 || parsedServerPort > 65535) {
             log('Invalid port. Please enter a number between 1024 and 65535.', 'red');
             continue;
           }
-          
+
           if (parsedServerPort === webPort) {
             log('Server port cannot be the same as web port.', 'red');
             continue;
           }
-          
+
           if (isPortInUse(parsedServerPort)) {
             const pids = getProcessesOnPort(parsedServerPort);
-            log(`Port ${parsedServerPort} is already in use by process(es): ${pids.join(', ')}`, 'red');
+            log(
+              `Port ${parsedServerPort} is already in use by process(es): ${pids.join(', ')}`,
+              'red'
+            );
             const useAnyway = await prompt('Use this port anyway? (y/n): ');
             if (useAnyway.toLowerCase() !== 'y' && useAnyway.toLowerCase() !== 'yes') {
               continue;
             }
           }
-          
+
           serverPort = parsedServerPort;
           break;
         }
-        
+
         log(`Using ports: Web=${webPort}, Server=${serverPort}`, 'blue');
         break;
       } else if (lowerChoice === 'c' || lowerChoice === 'cancel') {
         log('Cancelled.', 'yellow');
         process.exit(0);
       } else {
-        log('Invalid choice. Please enter k (kill), u (use different ports), or c (cancel).', 'red');
+        log(
+          'Invalid choice. Please enter k (kill), u (use different ports), or c (cancel).',
+          'red'
+        );
       }
     }
   } else {
