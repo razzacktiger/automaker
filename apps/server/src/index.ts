@@ -58,6 +58,8 @@ import { createMCPRoutes } from './routes/mcp/index.js';
 import { MCPTestService } from './services/mcp-test-service.js';
 import { createPipelineRoutes } from './routes/pipeline/index.js';
 import { pipelineService } from './services/pipeline-service.js';
+import { createIdeationRoutes } from './routes/ideation/index.js';
+import { IdeationService } from './services/ideation-service.js';
 
 // Load environment variables
 dotenv.config();
@@ -162,6 +164,7 @@ const featureLoader = new FeatureLoader();
 const autoModeService = new AutoModeService(events, settingsService);
 const claudeUsageService = new ClaudeUsageService();
 const mcpTestService = new MCPTestService(settingsService);
+const ideationService = new IdeationService(events, settingsService, featureLoader);
 
 // Initialize services
 (async () => {
@@ -215,6 +218,7 @@ app.use('/api/context', createContextRoutes(settingsService));
 app.use('/api/backlog-plan', createBacklogPlanRoutes(events, settingsService));
 app.use('/api/mcp', createMCPRoutes(mcpTestService));
 app.use('/api/pipeline', createPipelineRoutes(pipelineService));
+app.use('/api/ideation', createIdeationRoutes(events, ideationService, featureLoader));
 
 // Create HTTP server
 const server = createServer(app);

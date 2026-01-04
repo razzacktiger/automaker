@@ -6,9 +6,6 @@ interface UseBoardEffectsProps {
   currentProject: { path: string; id: string } | null;
   specCreatingForProject: string | null;
   setSpecCreatingForProject: (path: string | null) => void;
-  setSuggestionsCount: (count: number) => void;
-  setFeatureSuggestions: (suggestions: any[]) => void;
-  setIsGeneratingSuggestions: (generating: boolean) => void;
   checkContextExists: (featureId: string) => Promise<boolean>;
   features: any[];
   isLoading: boolean;
@@ -20,9 +17,6 @@ export function useBoardEffects({
   currentProject,
   specCreatingForProject,
   setSpecCreatingForProject,
-  setSuggestionsCount,
-  setFeatureSuggestions,
-  setIsGeneratingSuggestions,
   checkContextExists,
   features,
   isLoading,
@@ -43,26 +37,6 @@ export function useBoardEffects({
       (window as any).__currentProject = null;
     };
   }, [currentProject]);
-
-  // Listen for suggestions events to update count (persists even when dialog is closed)
-  useEffect(() => {
-    const api = getElectronAPI();
-    if (!api?.suggestions) return;
-
-    const unsubscribe = api.suggestions.onEvent((event) => {
-      if (event.type === 'suggestions_complete' && event.suggestions) {
-        setSuggestionsCount(event.suggestions.length);
-        setFeatureSuggestions(event.suggestions);
-        setIsGeneratingSuggestions(false);
-      } else if (event.type === 'suggestions_error') {
-        setIsGeneratingSuggestions(false);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [setSuggestionsCount, setFeatureSuggestions, setIsGeneratingSuggestions]);
 
   // Subscribe to spec regeneration events to clear creating state on completion
   useEffect(() => {

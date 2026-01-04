@@ -26,6 +26,13 @@ import type {
   GitHubPR,
   IssueValidationInput,
   IssueValidationEvent,
+  IdeationAPI,
+  IdeaCategory,
+  AnalysisSuggestion,
+  StartSessionOptions,
+  CreateIdeaInput,
+  UpdateIdeaInput,
+  ConvertToFeatureOptions,
 } from './electron';
 import type { Message, SessionListItem } from '@/types/electron';
 import type { Feature, ClaudeUsageResponse } from '@/store/app-store';
@@ -368,7 +375,9 @@ type EventType =
   | 'suggestions:event'
   | 'spec-regeneration:event'
   | 'issue-validation:event'
-  | 'backlog-plan:event';
+  | 'backlog-plan:event'
+  | 'ideation:stream'
+  | 'ideation:analysis';
 
 type EventCallback = (payload: unknown) => void;
 
@@ -1438,8 +1447,6 @@ export class HttpApiClient implements ElectronAPI {
           headers?: Record<string, string>;
           enabled?: boolean;
         }>;
-        mcpAutoApproveTools?: boolean;
-        mcpUnrestrictedTools?: boolean;
       };
       error?: string;
     }> => this.get('/api/settings/global'),
@@ -1637,6 +1644,66 @@ export class HttpApiClient implements ElectronAPI {
 
     onEvent: (callback: (data: unknown) => void): (() => void) => {
       return this.subscribeToEvent('backlog-plan:event', callback as EventCallback);
+    },
+  };
+
+  // Ideation API - brainstorming and idea management
+  ideation: IdeationAPI = {
+    startSession: (projectPath: string, options?: StartSessionOptions) =>
+      this.post('/api/ideation/session/start', { projectPath, options }),
+
+    getSession: (projectPath: string, sessionId: string) =>
+      this.post('/api/ideation/session/get', { projectPath, sessionId }),
+
+    sendMessage: (
+      sessionId: string,
+      message: string,
+      options?: { imagePaths?: string[]; model?: string }
+    ) => this.post('/api/ideation/session/message', { sessionId, message, options }),
+
+    stopSession: (sessionId: string) => this.post('/api/ideation/session/stop', { sessionId }),
+
+    listIdeas: (projectPath: string) => this.post('/api/ideation/ideas/list', { projectPath }),
+
+    createIdea: (projectPath: string, idea: CreateIdeaInput) =>
+      this.post('/api/ideation/ideas/create', { projectPath, idea }),
+
+    getIdea: (projectPath: string, ideaId: string) =>
+      this.post('/api/ideation/ideas/get', { projectPath, ideaId }),
+
+    updateIdea: (projectPath: string, ideaId: string, updates: UpdateIdeaInput) =>
+      this.post('/api/ideation/ideas/update', { projectPath, ideaId, updates }),
+
+    deleteIdea: (projectPath: string, ideaId: string) =>
+      this.post('/api/ideation/ideas/delete', { projectPath, ideaId }),
+
+    analyzeProject: (projectPath: string) => this.post('/api/ideation/analyze', { projectPath }),
+
+    generateSuggestions: (
+      projectPath: string,
+      promptId: string,
+      category: IdeaCategory,
+      count?: number
+    ) =>
+      this.post('/api/ideation/suggestions/generate', { projectPath, promptId, category, count }),
+
+    convertToFeature: (projectPath: string, ideaId: string, options?: ConvertToFeatureOptions) =>
+      this.post('/api/ideation/convert', { projectPath, ideaId, ...options }),
+
+    addSuggestionToBoard: (
+      projectPath: string,
+      suggestion: AnalysisSuggestion
+    ): Promise<{ success: boolean; featureId?: string; error?: string }> =>
+      this.post('/api/ideation/add-suggestion', { projectPath, suggestion }),
+
+    getPrompts: () => this.get('/api/ideation/prompts'),
+
+    onStream: (callback: (event: any) => void): (() => void) => {
+      return this.subscribeToEvent('ideation:stream', callback as EventCallback);
+    },
+
+    onAnalysisEvent: (callback: (event: any) => void): (() => void) => {
+      return this.subscribeToEvent('ideation:analysis', callback as EventCallback);
     },
   };
 

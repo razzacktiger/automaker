@@ -143,3 +143,30 @@ export type {
 
 // Port configuration
 export { STATIC_PORT, SERVER_PORT, RESERVED_PORTS } from './ports.js';
+
+// Ideation types
+export type {
+  IdeaCategory,
+  IdeaStatus,
+  ImpactLevel,
+  EffortLevel,
+  IdeaAttachment,
+  Idea,
+  IdeationSessionStatus,
+  IdeationSession,
+  IdeationMessage,
+  IdeationSessionWithMessages,
+  PromptCategory,
+  IdeationPrompt,
+  AnalysisFileInfo,
+  AnalysisSuggestion,
+  ProjectAnalysisResult,
+  StartSessionOptions,
+  SendMessageOptions,
+  CreateIdeaInput,
+  UpdateIdeaInput,
+  ConvertToFeatureOptions,
+  IdeationEventType,
+  IdeationStreamEvent,
+  IdeationAnalysisEvent,
+} from './ideation.js';

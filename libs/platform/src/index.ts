@@ -23,6 +23,17 @@ export {
   getCredentialsPath,
   getProjectSettingsPath,
   ensureDataDir,
+  // Ideation paths
+  getIdeationDir,
+  getIdeasDir,
+  getIdeaDir,
+  getIdeaPath,
+  getIdeaAttachmentsDir,
+  getIdeationSessionsDir,
+  getIdeationSessionPath,
+  getIdeationDraftsDir,
+  getIdeationAnalysisPath,
+  ensureIdeationDir,
 } from './paths.js';
 
 // Subprocess management
