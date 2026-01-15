@@ -40,7 +40,8 @@ export const queryKeys = {
     single: (projectPath: string, featureId: string) =>
       ['worktrees', projectPath, featureId] as const,
     /** Branches for a worktree */
-    branches: (worktreePath: string) => ['worktrees', 'branches', worktreePath] as const,
+    branches: (worktreePath: string, includeRemote = false) =>
+      ['worktrees', 'branches', worktreePath, { includeRemote }] as const,
     /** Worktree status */
     status: (projectPath: string, featureId: string) =>
       ['worktrees', projectPath, featureId, 'status'] as const,
@@ -86,7 +87,8 @@ export const queryKeys = {
     /** Credentials (API keys) */
     credentials: () => ['settings', 'credentials'] as const,
     /** Discovered agents */
-    agents: (projectPath: string) => ['settings', 'agents', projectPath] as const,
+    agents: (projectPath: string, sources?: Array<'user' | 'project'>) =>
+      ['settings', 'agents', projectPath, sources ?? []] as const,
   },
 
   // ============================================

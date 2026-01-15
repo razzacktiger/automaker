@@ -157,6 +157,11 @@ export function useSaveSpec(projectPath: string) {
 
   return useMutation({
     mutationFn: async (content: string) => {
+      // Guard against empty projectPath to prevent writing to invalid locations
+      if (!projectPath || projectPath.trim() === '') {
+        throw new Error('Invalid project path: cannot save spec without a valid project');
+      }
+
       const api = getElectronAPI();
 
       await api.writeFile(`${projectPath}/.automaker/app_spec.txt`, content);

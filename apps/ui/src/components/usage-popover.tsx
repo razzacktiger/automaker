@@ -304,7 +304,7 @@ export function UsagePopover() {
                   variant="ghost"
                   size="icon"
                   className={cn('h-6 w-6', claudeLoading && 'opacity-80')}
-                  onClick={() => !claudeLoading && fetchClaudeUsage(false)}
+                  onClick={() => !claudeLoading && fetchClaudeUsage()}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                 </Button>
@@ -411,7 +411,7 @@ export function UsagePopover() {
                   variant="ghost"
                   size="icon"
                   className={cn('h-6 w-6', codexLoading && 'opacity-80')}
-                  onClick={() => !codexLoading && fetchCodexUsage(false)}
+                  onClick={() => !codexLoading && fetchCodexUsage()}
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                 </Button>

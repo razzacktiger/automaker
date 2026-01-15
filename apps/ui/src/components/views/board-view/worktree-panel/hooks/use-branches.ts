@@ -22,9 +22,11 @@ export function useBranches() {
   const branches = branchData?.branches ?? [];
   const aheadCount = branchData?.aheadCount ?? 0;
   const behindCount = branchData?.behindCount ?? 0;
+  // Use conservative defaults (false) until data is confirmed
+  // This prevents the UI from assuming git capabilities before the query completes
   const gitRepoStatus: GitRepoStatus = {
-    isGitRepo: branchData?.isGitRepo ?? true,
-    hasCommits: branchData?.hasCommits ?? true,
+    isGitRepo: branchData?.isGitRepo ?? false,
+    hasCommits: branchData?.hasCommits ?? false,
   };
 
   const fetchBranches = useCallback(

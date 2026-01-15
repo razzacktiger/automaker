@@ -99,21 +99,36 @@ export function useResumeFeature(projectPath: string) {
  * Stop a running feature
  *
  * @returns Mutation for stopping a feature
+ *
+ * @example
+ * ```tsx
+ * const stopFeature = useStopFeature();
+ * // Simple stop
+ * stopFeature.mutate('feature-id');
+ * // Stop with project path for cache invalidation
+ * stopFeature.mutate({ featureId: 'feature-id', projectPath: '/path/to/project' });
+ * ```
  */
 export function useStopFeature() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (featureId: string) => {
+    mutationFn: async (input: string | { featureId: string; projectPath?: string }) => {
+      const featureId = typeof input === 'string' ? input : input.featureId;
       const api = getElectronAPI();
       const result = await api.autoMode.stopFeature(featureId);
       if (!result.success) {
         throw new Error(result.error || 'Failed to stop feature');
       }
-      return result;
+      // Return projectPath for use in onSuccess
+      return { ...result, projectPath: typeof input === 'string' ? undefined : input.projectPath };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.runningAgents.all() });
+      // Also invalidate features cache if projectPath is provided
+      if (data.projectPath) {
+        queryClient.invalidateQueries({ queryKey: queryKeys.features.all(data.projectPath) });
+      }
       toast.success('Feature stopped');
     },
     onError: (error: Error) => {

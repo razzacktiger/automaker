@@ -107,7 +107,8 @@ export function useDiscoveredAgents(
   sources?: Array<'user' | 'project'>
 ) {
   return useQuery({
-    queryKey: queryKeys.settings.agents(projectPath ?? ''),
+    // Include sources in query key so different source combinations have separate caches
+    queryKey: queryKeys.settings.agents(projectPath ?? '', sources),
     queryFn: async () => {
       const api = getElectronAPI();
       const result = await api.settings.discoverAgents(projectPath, sources);

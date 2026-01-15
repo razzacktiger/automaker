@@ -27,14 +27,12 @@ export function useSpecLoading() {
   const loadSpec = useCallback(async () => {
     if (!currentProject?.path) return;
 
-    // First check if generation is running
-    await queryClient.invalidateQueries({
+    // Fetch fresh status data to avoid stale cache issues
+    // Using fetchQuery ensures we get the latest data before checking
+    const statusData = await queryClient.fetchQuery<{ isRunning: boolean }>({
       queryKey: queryKeys.specRegeneration.status(currentProject.path),
+      staleTime: 0, // Force fresh fetch
     });
-
-    const statusData = queryClient.getQueryData<{ isRunning: boolean }>(
-      queryKeys.specRegeneration.status(currentProject.path)
-    );
 
     if (statusData?.isRunning) {
       return;

@@ -9,6 +9,7 @@ import { getElectronAPI, GitHubIssue, GitHubComment } from '@/lib/electron';
 import { queryKeys } from '@/lib/query-keys';
 import { toast } from 'sonner';
 import type { LinkedPRInfo, ModelId } from '@automaker/types';
+import { resolveModelString } from '@automaker/model-resolver';
 
 /**
  * Input for validating a GitHub issue
@@ -64,10 +65,13 @@ export function useValidateIssue(projectPath: string) {
         linkedPRs,
       };
 
+      // Resolve model alias to canonical model identifier
+      const resolvedModel = model ? resolveModelString(model) : undefined;
+
       const result = await api.github.validateIssue(
         projectPath,
         validationInput,
-        model,
+        resolvedModel,
         thinkingLevel,
         reasoningEffort
       );

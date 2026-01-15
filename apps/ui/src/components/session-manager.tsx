@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createLogger } from '@automaker/utils/logger';
 import { useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -119,6 +119,9 @@ export function SessionManager({
   // Use React Query for sessions list - always include archived, filter client-side
   const { data: sessions = [], refetch: refetchSessions } = useSessions(true);
 
+  // Ref to track if we've done the initial running sessions check
+  const hasCheckedInitialRef = useRef(false);
+
   // Check running state for all sessions
   const checkRunningSessions = useCallback(async (sessionList: SessionListItem[]) => {
     const api = getElectronAPI();
@@ -152,12 +155,13 @@ export function SessionManager({
     }
   }, [queryClient, refetchSessions, checkRunningSessions]);
 
-  // Check running state on initial load
+  // Check running state on initial load (runs only once when sessions first load)
   useEffect(() => {
-    if (sessions.length > 0) {
+    if (sessions.length > 0 && !hasCheckedInitialRef.current) {
+      hasCheckedInitialRef.current = true;
       checkRunningSessions(sessions);
     }
-  }, [sessions.length > 0]); // Only run when sessions first load
+  }, [sessions, checkRunningSessions]);
 
   // Periodically check running state for sessions (useful for detecting when agents finish)
   useEffect(() => {

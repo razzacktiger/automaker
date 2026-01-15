@@ -34,8 +34,8 @@ export function RunningAgentsView() {
   }, [refetch]);
 
   const handleStopAgent = useCallback(
-    (featureId: string) => {
-      stopFeature.mutate(featureId);
+    (featureId: string, projectPath: string) => {
+      stopFeature.mutate({ featureId, projectPath });
     },
     [stopFeature]
   );
@@ -168,7 +168,7 @@ export function RunningAgentsView() {
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleStopAgent(agent.featureId)}
+                    onClick={() => handleStopAgent(agent.featureId, agent.projectPath)}
                     disabled={stopFeature.isPending}
                   >
                     <Square className="h-3.5 w-3.5 mr-1.5" />

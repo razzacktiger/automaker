@@ -162,7 +162,8 @@ interface BranchesResult {
  */
 export function useWorktreeBranches(worktreePath: string | undefined, includeRemote = false) {
   return useQuery({
-    queryKey: queryKeys.worktrees.branches(worktreePath ?? ''),
+    // Include includeRemote in query key so different configurations have separate caches
+    queryKey: queryKeys.worktrees.branches(worktreePath ?? '', includeRemote),
     queryFn: async (): Promise<BranchesResult> => {
       if (!worktreePath) throw new Error('No worktree path');
       const api = getElectronAPI();
