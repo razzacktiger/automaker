@@ -7,12 +7,7 @@
 
 import * as secureFs from '../../lib/secure-fs.js';
 import type { EventEmitter } from '../../lib/events.js';
-import {
-  specOutputSchema,
-  specToXml,
-  getStructuredSpecPromptInstruction,
-  type SpecOutput,
-} from '../../lib/app-spec-format.js';
+import { specOutputSchema, specToXml, type SpecOutput } from '../../lib/app-spec-format.js';
 import { createLogger } from '@automaker/utils';
 import { DEFAULT_PHASE_MODELS, isCursorModel } from '@automaker/types';
 import { resolvePhaseModel } from '@automaker/model-resolver';
@@ -21,7 +16,7 @@ import { streamingQuery } from '../../providers/simple-query-service.js';
 import { generateFeaturesFromSpec } from './generate-features-from-spec.js';
 import { ensureAutomakerDir, getAppSpecPath } from '@automaker/platform';
 import type { SettingsService } from '../../services/settings-service.js';
-import { getAutoLoadClaudeMdSetting } from '../../lib/settings-helpers.js';
+import { getAutoLoadClaudeMdSetting, getPromptCustomization } from '../../lib/settings-helpers.js';
 
 const logger = createLogger('SpecRegeneration');
 
@@ -42,6 +37,9 @@ export async function generateSpec(
   logger.info('generateFeatures:', generateFeatures);
   logger.info('analyzeProject:', analyzeProject);
   logger.info('maxFeatures:', maxFeatures);
+
+  // Get customized prompts from settings
+  const prompts = await getPromptCustomization(settingsService, '[SpecRegeneration]');
 
   // Build the prompt based on whether we should analyze the project
   let analysisInstructions = '';
@@ -66,9 +64,7 @@ export async function generateSpec(
 Use these technologies as the foundation for the specification.`;
   }
 
-  const prompt = `You are helping to define a software project specification.
-
-IMPORTANT: Never ask for clarification or additional information. Use the information provided and make reasonable assumptions to create the best possible specification. If details are missing, infer them based on common patterns and best practices.
+  const prompt = `${prompts.appSpec.generateSpecSystemPrompt}
 
 Project Overview:
 ${projectOverview}
@@ -77,7 +73,7 @@ ${techStackDefaults}
 
 ${analysisInstructions}
 
-${getStructuredSpecPromptInstruction()}`;
+${prompts.appSpec.structuredSpecInstructions}`;
 
   logger.info('========== PROMPT BEING SENT ==========');
   logger.info(`Prompt length: ${prompt.length} chars`);

@@ -14,7 +14,7 @@ import { streamingQuery } from '../../providers/simple-query-service.js';
 import { parseAndCreateFeatures } from './parse-and-create-features.js';
 import { getAppSpecPath } from '@automaker/platform';
 import type { SettingsService } from '../../services/settings-service.js';
-import { getAutoLoadClaudeMdSetting } from '../../lib/settings-helpers.js';
+import { getAutoLoadClaudeMdSetting, getPromptCustomization } from '../../lib/settings-helpers.js';
 
 const logger = createLogger('SpecRegeneration');
 
@@ -53,38 +53,16 @@ export async function generateFeaturesFromSpec(
     return;
   }
 
+  // Get customized prompts from settings
+  const prompts = await getPromptCustomization(settingsService, '[FeatureGeneration]');
+
   const prompt = `Based on this project specification:
 
 ${spec}
 
-Generate a prioritized list of implementable features. For each feature provide:
+${prompts.appSpec.generateFeaturesFromSpecPrompt}
 
-1. **id**: A unique lowercase-hyphenated identifier
-2. **category**: Functional category (e.g., "Core", "UI", "API", "Authentication", "Database")
-3. **title**: Short descriptive title
-4. **description**: What this feature does (2-3 sentences)
-5. **priority**: 1 (high), 2 (medium), or 3 (low)
-6. **complexity**: "simple", "moderate", or "complex"
-7. **dependencies**: Array of feature IDs this depends on (can be empty)
-
-Format as JSON:
-{
-  "features": [
-    {
-      "id": "feature-id",
-      "category": "Feature Category",
-      "title": "Feature Title",
-      "description": "What it does",
-      "priority": 1,
-      "complexity": "moderate",
-      "dependencies": []
-    }
-  ]
-}
-
-Generate ${featureCount} features that build on each other logically.
-
-IMPORTANT: Do not ask for clarification. The specification is provided above. Generate the JSON immediately.`;
+Generate ${featureCount} features that build on each other logically.`;
 
   logger.info('========== PROMPT BEING SENT ==========');
   logger.info(`Prompt length: ${prompt.length} chars`);
